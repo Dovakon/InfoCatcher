@@ -16,7 +16,7 @@ public class GenerateMap : MonoBehaviour {
     public int numberBlocksX;
     public int numberBlocksY;
     private Block[] block;
-
+    private bool AllBlocksSpawned = false;
 
     //Walls//
     private int Walls;
@@ -30,29 +30,36 @@ public class GenerateMap : MonoBehaviour {
         numberWallsX = numberBlocksX - 1;
         numberWallsY = numberBlocksY - 1;
 
-        float wallEveryX = (float)sizeSpaceX / numberWallsX;
+
+
+        DefineBlock();
         
+        
+        StartCoroutine(SetRoute());
+
+    }
+
+    private void DefineBlock()
+    {
+
+        float wallEveryX = (float)sizeSpaceX / numberWallsX;
         float wallEveryY = (float)sizeSpaceY / numberWallsY;
-        //
-
-
+        
         block = new Block[numberBlocksX * numberBlocksY];
         float blockEveryX = (float)sizeSpaceX / numberBlocksX;
         float blockEveryY = (float)sizeSpaceY / numberBlocksY;
-
-        //print(blockEveryX + " " + blockEveryY);
+        
 
         float xposs, yposs;
         xposs = blockEveryX / 2;
         yposs = blockEveryY / 2;
-        //print(xposs +" "+ yposs);
-
-        int counter = 0;
         
+        int counter = 0;
+
         for (int y = 0; y < numberBlocksY; y++)
         {
 
-            //block[counter].leftMove = false;
+            
             for (int x = 0; x < numberBlocksX; x++)
             {
 
@@ -65,22 +72,19 @@ public class GenerateMap : MonoBehaviour {
                 WhereToMove(counter);
                 counter++;
                 xposs += blockEveryX;
-               
+
 
             }
-            xposs = blockEveryX/2;
+            xposs = blockEveryX / 2;
             yposs += blockEveryY;
 
+            //**//
             //Cant Move Right
             //Probably Will Change  
-            block[counter - 1].rightMove = false;
-            
+            block[counter - 1].rightMove = false; // Right
+            //**//
 
         }
-
-        
-        //SetRoute();
-
     }
 
     private void WhereToMove(int blk)
@@ -105,61 +109,170 @@ public class GenerateMap : MonoBehaviour {
     }
 
 
-    private void SetRoute()
+    private IEnumerator SetRoute()
     {
-        //Two Start Pints
+        //Track route
+        List<int> LeftBlockRoute = new List<int>();
+        List<int> RightBlockRoute = new List<int>();
+        int leftListPointer = 0;
+        int rightListPointer = 0;
+
+        //Two Start Points
         int currentPossLeft = 0;
+        LeftBlockRoute.Add(currentPossLeft);
         int currentPossRight = numberBlocksX - 1;
+        RightBlockRoute.Add(currentPossRight);
+        
         Instantiate(LeftBlock, block[currentPossLeft].Possition, Quaternion.identity);
+        block[currentPossLeft].isCaptured = true;
         Instantiate(RightBlock, block[currentPossRight].Possition, Quaternion.identity);
+        block[currentPossRight].isCaptured = true;
 
-
-        //RandomMove(currentPossLeft, LeftBlock);
-
-
-    }
-
-    private void RandomMove(int poss, GameObject block)
-    {
-        bool moveChosen = false;
-        while (!moveChosen)
+        for (int i = 0; i < 500; i++)
         {
-            
-            int move = Random.Range(0, 5);
-
-            if (move == 0) //Left
+            yield return new WaitForSeconds(.5f);
+            //Left Route
+            int nextPossLeft = RandomMove(currentPossLeft, LeftBlock);
+            if(nextPossLeft == currentPossLeft)// didnt find any available block to move
             {
-                if ((poss - 1) > 0)
-                {
-                    poss--;
-                    //Instantiate(block, block[poss].Possition, Quaternion.identity);
-                    moveChosen = true;
-                }
-
+                leftListPointer--;
+                currentPossLeft = LeftBlockRoute[leftListPointer];
+                LeftBlockRoute.Add(currentPossLeft);
             }
-            else if (move == 1) // Up
+            else
             {
-                if ((poss + numberBlocksX) > numberBlocksX * numberBlocksY)
-                {
-                    poss += numberBlocksX;
-                   // Instantiate(block, BlockPossition[poss], Quaternion.identity);
-                    moveChosen = true;
-                }
-
+                LeftBlockRoute.Add(currentPossLeft);
+                leftListPointer = LeftBlockRoute.Count;
+                currentPossLeft = nextPossLeft;
             }
-            else if (move == 2) // Right
-            {
-                if ((poss + 1) > numberBlocksX)
-                {
-                    poss += numberBlocksX;
-                   // Instantiate(block, BlockPossition[poss], Quaternion.identity);
-                    moveChosen = true;
-                }
 
+            yield return new WaitForSeconds(.5f);
+            //Right Route
+            int nextPossRight = RandomMove(currentPossRight, RightBlock);
+            if (nextPossRight == currentPossRight)// didnt find any available block to move
+            {
+                rightListPointer--;
+                currentPossRight = RightBlockRoute[rightListPointer];
+                RightBlockRoute.Add(currentPossRight);
+            }
+            else
+            {
+                RightBlockRoute.Add(currentPossRight);
+                rightListPointer = RightBlockRoute.Count;
+                currentPossRight = nextPossRight;
             }
         }
     }
 
+    
+
+    private int RandomMove(int poss, GameObject blk)
+    {
+
+        List<string> availableMoves = new List<string>();
+        if (block[poss].leftMove == true)
+        {
+            if (!block[poss - 1].isCaptured) //Left
+            {
+                availableMoves.Add("Left");
+            }
+        }
+        if (block[poss].upMove == true)
+        {
+            if (!block[poss + numberBlocksX].isCaptured) // Up
+            {
+                availableMoves.Add("Up");
+            }
+        }
+        if (block[poss].rightMove == true)
+        {
+            if (!block[poss + 1].isCaptured) //Right
+            {
+                availableMoves.Add("Right");
+            }
+        }
+        if (block[poss].downMove == true)
+        {
+            if (!block[poss - numberBlocksX].isCaptured) //Down
+            {
+                availableMoves.Add("Down");
+            }
+        }
+
+
+        if (availableMoves.Count == 0)
+        {
+            if(CheckAllBlockSpawn())
+            {
+                AllBlocksSpawned = true;
+                return 0;
+            }
+            else
+            {
+                return poss;
+            }
+
+        }
+        else
+        {
+            int move = Random.Range(0, availableMoves.Count);
+
+            poss = ChoseMovement(availableMoves[move], poss);
+            Instantiate(blk, block[poss].Possition, Quaternion.identity);
+            return poss;
+        }
+        
+    }
+
+
+    private int ChoseMovement(string move, int poss)
+    {
+        if (move == "Left")
+        {
+            poss--;
+            block[poss].isCaptured = true;
+            return poss;
+        }
+        else if (move == "Up") // Up
+        {
+            poss += numberBlocksX;
+            block[poss].isCaptured = true;
+            return poss;
+        }
+        
+        else if (move == "Right") // Right
+        {
+            poss++;
+            block[poss].isCaptured = true;
+            return poss;
+        }
+        else if (move == "Down") // Down
+        {
+            poss -= numberBlocksX;
+            block[poss].isCaptured = true;
+            return poss;
+            
+        }
+        else
+        {
+            return -1;
+            Debug.LogError("Danger!! No Move Available");
+        }
+    }
+
+    private bool CheckAllBlockSpawn()
+    {
+        bool allspawned = true;
+            
+        foreach (var blk in block)
+        {
+            if(blk.isCaptured == false)
+            {
+                allspawned = false;
+            }
+        }
+        return allspawned;
+    }
 
     private void test()
     {
@@ -201,6 +314,7 @@ public class Block
     public bool rightMove = true;
     public bool downMove = true;
 
+    public bool isCaptured;
 
     public Vector2 Possition;
 }
