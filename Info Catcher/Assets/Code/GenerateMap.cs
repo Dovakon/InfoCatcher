@@ -5,45 +5,120 @@ using UnityEngine;
 
 public class GenerateMap : MonoBehaviour {
 
-    public int sizeSpaceX;
-    public int sizeSpaceY;
+    [Range(0f, 3)]
+    public float GenerateTime;
+
+    public float sizeSpaceX;
+    public float sizeSpaceY;
     
 
     public GameObject LeftBlock;
     public GameObject RightBlock;
+    public GameObject HorizontalWall;
+    public GameObject VerticalWall;
 
     //Blocks//
     public int numberBlocksX;
     public int numberBlocksY;
     private Block[] block;
+    
     private bool AllBlocksSpawned = false;
 
     //Walls//
-    private int Walls;
     private int numberWallsX;
     private int numberWallsY;
+    private GameObject[] VerticalWalls;
+    private GameObject[] HorizontalWalls;
     //....///
 
-    void Start () {
-        
-        //Walls//
-        numberWallsX = numberBlocksX - 1;
-        numberWallsY = numberBlocksY - 1;
-
-
-
+    void Start ()
+    {   
+        InstantiateWalls();
         DefineBlock();
         
-        
         StartCoroutine(SetRoute());
-
     }
 
+
+
+    //Walls
+    private void InstantiateWalls()
+    {
+        //Walls//
+        numberWallsX = numberBlocksX;
+        numberWallsY = numberBlocksX;
+
+        VerticalWalls = new GameObject[numberBlocksX * numberBlocksY];
+        HorizontalWalls = new GameObject[numberBlocksX * numberBlocksY];
+
+
+
+        float wallEveryX = (float)sizeSpaceX / numberBlocksX;
+        float wallEveryY = (float)sizeSpaceY / numberBlocksY;
+
+        
+        int Vcounter = 0;
+        int Hcounter = 0;
+        //Vector2 poss = new Vector2(wallEveryX, wallEveryY);
+        
+        float Xposs = wallEveryY * .5f;
+        float Yposs = 0f;
+
+        for (int i = 0; i < numberBlocksY; i++)
+        {
+           
+            for (int y = 0; y < numberBlocksX; y++)
+            {
+                GameObject wallobj = Instantiate(HorizontalWall,new Vector2 (Xposs, Yposs), HorizontalWall.transform.rotation);
+                wallobj.transform.localScale = new Vector2(wallobj.transform.localScale.x, wallEveryX);
+                HorizontalWalls[Hcounter] = wallobj;
+                Hcounter++;
+                Xposs += wallEveryX;
+                
+            }
+
+            Xposs = 0;
+            Yposs += wallEveryY * .5f;
+            
+            for (int y = 0; y < numberBlocksX; y++)
+            {
+                GameObject wallobj = Instantiate(VerticalWall, new Vector2(Xposs, Yposs), Quaternion.identity);
+                wallobj.transform.localScale = new Vector2(wallobj.transform.localScale.x, wallEveryY);
+                VerticalWalls[Vcounter] = wallobj;
+                Vcounter++;
+                Xposs += wallEveryX;
+            }
+            
+            Xposs = wallEveryX * .5f;
+            Yposs += wallEveryY * .5f;
+        }
+    }
+
+    private void RemoveWall(int poss, string move)
+    {
+        if (move == "Left")
+        {
+            Destroy(VerticalWalls[poss].gameObject);
+        }
+        if (move == "Up")
+        {
+            Destroy(HorizontalWalls[poss + numberBlocksX].gameObject);
+        }
+        if (move == "Right")
+        {
+            Destroy(VerticalWalls[poss + 1].gameObject);
+        }
+        if (move == "Down")
+        {
+            Destroy(HorizontalWalls[poss].gameObject);
+        }
+    }
+
+    //Create Blocks//
     private void DefineBlock()
     {
 
-        float wallEveryX = (float)sizeSpaceX / numberWallsX;
-        float wallEveryY = (float)sizeSpaceY / numberWallsY;
+       
         
         block = new Block[numberBlocksX * numberBlocksY];
         float blockEveryX = (float)sizeSpaceX / numberBlocksX;
@@ -69,7 +144,7 @@ public class GenerateMap : MonoBehaviour {
                     Possition = new Vector2(xposs, yposs)
                 };
 
-                WhereToMove(counter);
+                WhereCanMove(counter);
                 counter++;
                 xposs += blockEveryX;
 
@@ -86,8 +161,7 @@ public class GenerateMap : MonoBehaviour {
 
         }
     }
-
-    private void WhereToMove(int blk)
+`   private void WhereCanMove(int blk)
     {
 
         if(blk % numberBlocksX == 0)  //Left
@@ -107,20 +181,23 @@ public class GenerateMap : MonoBehaviour {
             block[blk].upMove = false;
         }
     }
+    ///......///
 
 
+    //Create Map//
     private IEnumerator SetRoute()
     {
         //Track route
         List<int> LeftBlockRoute = new List<int>();
         List<int> RightBlockRoute = new List<int>();
+        
         int leftListPointer = 0;
         int rightListPointer = 0;
 
         //Two Start Points
         int currentPossLeft = 0;
         LeftBlockRoute.Add(currentPossLeft);
-        int currentPossRight = numberBlocksX - 1;
+        int currentPossRight = 18;
         RightBlockRoute.Add(currentPossRight);
         
         Instantiate(LeftBlock, block[currentPossLeft].Possition, Quaternion.identity);
@@ -128,43 +205,59 @@ public class GenerateMap : MonoBehaviour {
         Instantiate(RightBlock, block[currentPossRight].Possition, Quaternion.identity);
         block[currentPossRight].isCaptured = true;
 
-        for (int i = 0; i < 500; i++)
+        while(!AllBlocksSpawned)
         {
-            yield return new WaitForSeconds(.5f);
+            yield return new WaitForSeconds(GenerateTime);
             //Left Route
             int nextPossLeft = RandomMove(currentPossLeft, LeftBlock);
-            if(nextPossLeft == currentPossLeft)// didnt find any available block to move
+
+
+            if (nextPossLeft == currentPossLeft)// didnt find any available block to move
             {
                 leftListPointer--;
-                currentPossLeft = LeftBlockRoute[leftListPointer];
-                LeftBlockRoute.Add(currentPossLeft);
+                if (leftListPointer >= 0)
+                {
+                    currentPossLeft = LeftBlockRoute[leftListPointer];
+                    LeftBlockRoute.Add(currentPossLeft);
+                    CheckAllBlockSpawn();
+                }
+
             }
-            else
+            else if (leftListPointer >= 0)
             {
                 LeftBlockRoute.Add(currentPossLeft);
-                leftListPointer = LeftBlockRoute.Count;
+                leftListPointer = LeftBlockRoute.Count - 1;
                 currentPossLeft = nextPossLeft;
             }
-
-            yield return new WaitForSeconds(.5f);
+            
+           
+            yield return new WaitForSeconds(GenerateTime);
             //Right Route
             int nextPossRight = RandomMove(currentPossRight, RightBlock);
+
             if (nextPossRight == currentPossRight)// didnt find any available block to move
             {
                 rightListPointer--;
-                currentPossRight = RightBlockRoute[rightListPointer];
-                RightBlockRoute.Add(currentPossRight);
+                if (rightListPointer >= 0)
+                {
+                    currentPossRight = RightBlockRoute[rightListPointer];
+                    RightBlockRoute.Add(currentPossRight);
+                    CheckAllBlockSpawn();
+                }
             }
             else
             {
-                RightBlockRoute.Add(currentPossRight);
-                rightListPointer = RightBlockRoute.Count;
-                currentPossRight = nextPossRight;
+                if (rightListPointer >= 0)
+                {
+                    RightBlockRoute.Add(currentPossRight);
+                    rightListPointer = RightBlockRoute.Count - 1;
+                    currentPossRight = nextPossRight;
+                }
             }
         }
-    }
 
-    
+        print("Set Route Finished");
+    }
 
     private int RandomMove(int poss, GameObject blk)
     {
@@ -176,6 +269,7 @@ public class GenerateMap : MonoBehaviour {
             {
                 availableMoves.Add("Left");
             }
+           
         }
         if (block[poss].upMove == true)
         {
@@ -183,6 +277,7 @@ public class GenerateMap : MonoBehaviour {
             {
                 availableMoves.Add("Up");
             }
+           
         }
         if (block[poss].rightMove == true)
         {
@@ -190,6 +285,7 @@ public class GenerateMap : MonoBehaviour {
             {
                 availableMoves.Add("Right");
             }
+           
         }
         if (block[poss].downMove == true)
         {
@@ -197,6 +293,7 @@ public class GenerateMap : MonoBehaviour {
             {
                 availableMoves.Add("Down");
             }
+           
         }
 
 
@@ -217,13 +314,13 @@ public class GenerateMap : MonoBehaviour {
         {
             int move = Random.Range(0, availableMoves.Count);
 
+            RemoveWall(poss, availableMoves[move]);
             poss = ChoseMovement(availableMoves[move], poss);
             Instantiate(blk, block[poss].Possition, Quaternion.identity);
             return poss;
         }
         
     }
-
 
     private int ChoseMovement(string move, int poss)
     {
@@ -273,36 +370,11 @@ public class GenerateMap : MonoBehaviour {
         }
         return allspawned;
     }
-
-    private void test()
+    
+    private void ChoseLink()
     {
-        bool moveChosen = true;
-        while (moveChosen)
-        {
 
-            int move = Random.Range(0, 5);
-
-            if (moveChosen)
-            {
-                if (moveChosen)
-                {
-                   print("prwto if");
-                    break; 
-
-                }
-                if(moveChosen)
-                {
-                    print("Deutero if");
-                    break;
-                }
-
-            }
-            print("While");
-            moveChosen = false;
-        }
-        print("teleuteo");
     }
-
 }
 
 [System.Serializable]
