@@ -10,18 +10,20 @@ public class GenerateMap : MonoBehaviour {
 
     public float sizeSpaceX;
     public float sizeSpaceY;
-    
+    public int numberBlocksX;
+    public int numberBlocksY;
 
     public GameObject BlackBlock;
     public GameObject WhiteBlock;
     public GameObject HorizontalWall;
     public GameObject VerticalWall;
-
+    public GameObject BlackArrow;
+    public GameObject WhiteArrow;
+    public GameObject BlocksParent;
     //Blocks//
-    public int numberBlocksX;
-    public int numberBlocksY;
     private Block[] block;
-   
+    private int BlackEntryPoint = 0;
+    private int WhiteEntryPoint = 0;
     private bool AllBlocksSpawned = false;
 
 
@@ -30,6 +32,7 @@ public class GenerateMap : MonoBehaviour {
     private int numberWallsY;
     private GameObject[] VerticalWalls;
     private GameObject[] HorizontalWalls;
+    private GameObject[] UpWalls, RightWalls;
     private List<GameObject> LinkWalls;
     //....///
 
@@ -37,17 +40,57 @@ public class GenerateMap : MonoBehaviour {
     {
         LinkWalls = new List<GameObject>();
 
-        InstantiateWalls();
-        DefineBlock();
+
         
+        DefineBlock();
+        InstantiateWalls();
+
+
+        EntryPoints();
         StartCoroutine(SetRoute());
     }
 
+    void Update()
+    {
+         if(Input.GetKeyDown("space"))
+            {
+                DestroyBlocksObjects();
+            }
+    }
 
 
     //Walls
     private void InstantiateWalls()
-    {
+    {   
+
+        float wallEveryX = (float)sizeSpaceX / numberBlocksX;
+        float wallEveryY = (float)sizeSpaceY / numberBlocksY;
+        float Xposs = wallEveryX * .5f;
+        float Yposs = sizeSpaceY;
+
+        //UP & Right Walls
+        UpWalls = new GameObject[numberBlocksX];
+        RightWalls = new GameObject[numberBlocksY];
+        for (int i = 0; i < numberBlocksX; i++)
+        {
+            GameObject wallobj = Instantiate(HorizontalWall, new Vector2(Xposs, Yposs), HorizontalWall.transform.rotation);
+            wallobj.transform.localScale = new Vector2(wallobj.transform.localScale.x, wallEveryX);
+            UpWalls[i] = wallobj;
+            Xposs += wallEveryX;
+
+        }
+        Xposs = sizeSpaceX;
+        Yposs = wallEveryY * .5f;
+        
+        for (int i = 0; i < numberBlocksY; i++)
+        {
+            GameObject wallobj = Instantiate(HorizontalWall, new Vector2(Xposs, Yposs), Quaternion.identity);
+            wallobj.transform.localScale = new Vector2(wallobj.transform.localScale.x, wallEveryY);
+            RightWalls[i] = wallobj;
+            Yposs += wallEveryY;
+        }
+
+
         //Walls//
         numberWallsX = numberBlocksX;
         numberWallsY = numberBlocksX;
@@ -57,16 +100,16 @@ public class GenerateMap : MonoBehaviour {
 
 
 
-        float wallEveryX = (float)sizeSpaceX / numberBlocksX;
-        float wallEveryY = (float)sizeSpaceY / numberBlocksY;
+        wallEveryX = (float)sizeSpaceX / numberBlocksX;
+        wallEveryY = (float)sizeSpaceY / numberBlocksY;
 
         
         int Vcounter = 0;
         int Hcounter = 0;
         //Vector2 poss = new Vector2(wallEveryX, wallEveryY);
         
-        float Xposs = wallEveryY * .5f;
-        float Yposs = 0f;
+        Xposs = wallEveryX * .5f;
+        Yposs = 0f;
 
         for (int i = 0; i < numberBlocksY; i++)
         {
@@ -138,7 +181,17 @@ public class GenerateMap : MonoBehaviour {
         }
         
     }
+
+    private void DestroyLinkWall()
+    {
+        int wall = Random.Range(0, LinkWalls.Count);
+        Destroy(LinkWalls[wall].gameObject);
+
+    }
+
+
     //Create Blocks//
+   
     private void DefineBlock()
     {
 
@@ -205,12 +258,7 @@ public class GenerateMap : MonoBehaviour {
             block[blk].upMove = false;
         }
     }
-    private void DestroyLinkWall()
-    {
-        int wall = Random.Range(0, LinkWalls.Count);
-        Destroy(LinkWalls[wall].gameObject);
-            
-    }
+   
     ///......///
 
 
@@ -224,15 +272,17 @@ public class GenerateMap : MonoBehaviour {
         int BlackListPointer = 0;
         int WhiteListPointer = 0;
 
-        //Two Start Points
-        int currentPossBlack = 0;
+        //Two Entry Points
+        int currentPossBlack = BlackEntryPoint;
         BlackBlockRoute.Add(currentPossBlack);
-        int currentPossWhite = 3;
+        int currentPossWhite = WhiteEntryPoint;
         WhiteBlockRoute.Add(currentPossWhite);
         
-        Instantiate(BlackBlock, block[currentPossBlack].Possition, Quaternion.identity);
+        GameObject obj = Instantiate(BlackBlock, block[currentPossBlack].Possition, Quaternion.identity);
+        obj.transform.parent = BlocksParent.transform;
         block[currentPossBlack].CapturedBy = "Black";
-        Instantiate(WhiteBlock, block[currentPossWhite].Possition, Quaternion.identity);
+        obj = Instantiate(WhiteBlock, block[currentPossWhite].Possition, Quaternion.identity);
+        obj.transform.parent = BlocksParent.transform;
         block[currentPossWhite].CapturedBy = "White";
 
         while(!AllBlocksSpawned)
@@ -377,7 +427,8 @@ public class GenerateMap : MonoBehaviour {
 
             RemoveWall(poss, availableMoves[move]);
             poss = ReturnNextPosition(availableMoves[move], poss, block[poss].CapturedBy);
-            Instantiate(blk, block[poss].Possition, Quaternion.identity);
+            GameObject obj = Instantiate(blk, block[poss].Possition, Quaternion.identity);
+            obj.transform.parent = BlocksParent.transform;
             return poss;
         }
         
@@ -431,8 +482,34 @@ public class GenerateMap : MonoBehaviour {
         }
         return allspawned;
     }
-    
-   
+
+    private void EntryPoints()
+    {
+        while (BlackEntryPoint == WhiteEntryPoint)
+        {
+            BlackEntryPoint = Random.Range(0, numberBlocksX);
+            WhiteEntryPoint = Random.Range(0, numberBlocksX);
+
+
+        }
+       
+        Instantiate(BlackArrow, block[BlackEntryPoint].Possition - new Vector2(0, .8f), Quaternion.Euler(0, 0, -90));
+        Destroy(HorizontalWalls[BlackEntryPoint].gameObject);
+        Instantiate(BlackArrow, block[block.Length - BlackEntryPoint - 1].Possition + new Vector2(0, .8f), Quaternion.Euler(0, 0, -90));
+        Destroy(UpWalls[UpWalls.Length - BlackEntryPoint - 1].gameObject);
+
+
+        Instantiate(WhiteArrow, block[WhiteEntryPoint].Possition - new Vector2(0, .8f), Quaternion.Euler(0, 0, -90));
+        Destroy(HorizontalWalls[WhiteEntryPoint].gameObject);
+        Instantiate(WhiteArrow, block[block.Length - WhiteEntryPoint - 1].Possition + new Vector2(0, .8f), Quaternion.Euler(0, 0, -90));
+        Destroy(UpWalls[UpWalls.Length - WhiteEntryPoint - 1].gameObject);
+    }
+
+    private void DestroyBlocksObjects()
+    {
+        Destroy(BlocksParent);
+    }
+
 }
 
 [System.Serializable]

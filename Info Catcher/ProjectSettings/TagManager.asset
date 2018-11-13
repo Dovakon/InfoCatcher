@@ -44,6 +44,9 @@ TagManager:
   - name: Walls
     uniqueID: 552577077
     locked: 0
+  - name: Entry Points
+    uniqueID: 2481885943
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
