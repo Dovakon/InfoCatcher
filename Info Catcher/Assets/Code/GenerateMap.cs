@@ -390,7 +390,7 @@ public class GenerateMap : MonoBehaviour {
         ChoseLinkWall();
         int blackGoalPoint = numberBlocksX * numberBlocksY - BlackEntryPoint - 1;
         int whiteGoalPoint = numberBlocksX * numberBlocksY - WhiteEntryPoint - 1;
-        createPath.DefinePath(block, numberBlocksX, BlackEntryPoint, blackGoalPoint, WhiteEntryPoint, whiteGoalPoint);
+        StartCoroutine(createPath.DefinePath(block, numberBlocksX, BlackEntryPoint, blackGoalPoint, WhiteEntryPoint, whiteGoalPoint));
 
     }
 
@@ -447,23 +447,23 @@ public class GenerateMap : MonoBehaviour {
         if (move == "Left")
         {
             block[poss]._rightMove = false;
-            block[poss].RightMove = false;
+            //block[poss].RightMove = false;
         }
         else if (move == "Up") // Up
         {
             block[poss]._downMove = false;
-            block[poss].DownMove = false;
+            //block[poss].DownMove = false;
         }
 
         else if (move == "Right") // Right
         {
             block[poss]._leftMove = false;
-            block[poss].LeftMove = false;
+            //block[poss].LeftMove = false;
         }
         else if (move == "Down") // Down
         {
             block[poss]._upMove = false;
-            block[poss].UpMove = false;
+            //block[poss].UpMove = false;
 
         }
     }
