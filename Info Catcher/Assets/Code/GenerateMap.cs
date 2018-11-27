@@ -18,8 +18,8 @@ public class GenerateMap : MonoBehaviour {
     public GameObject WhiteBlock;
     public GameObject HorizontalWallObject;
     public GameObject VerticalWallObject;
-    public GameObject BlackArrow;
-    public GameObject WhiteArrow;
+    public GameObject BlackEntry;
+    public GameObject WhiteEntry;
     public GameObject BlocksParent;
     public CreatePath createPath;
 
@@ -37,11 +37,16 @@ public class GenerateMap : MonoBehaviour {
     private GameObject[] HorizontalWalls;
     private GameObject[] UpWalls, RightWalls;
     private List<GameObject> LinkWalls;
+    private MaterialPropertyBlock _propBlock;
+    private bool dissolveWalls = false;
     //....///
     public bool insta;
+    public bool CreateBlockObject;
     private bool showBlockNumbers = false;
     void Start()
     {
+        _propBlock = new MaterialPropertyBlock();
+        _propBlock.SetFloat("_DissolveAmount", 1);
         LinkWalls = new List<GameObject>();
 
         DefineBlock();
@@ -65,12 +70,15 @@ public class GenerateMap : MonoBehaviour {
     {
         if (Input.GetKeyDown("space"))
         {
+            print("Space");
             DestroyBlocksObjects();
         }
         if (Input.GetKeyDown("s"))
         {
             showBlockNumbers = true;
         }
+
+       
     }
 
 
@@ -89,7 +97,7 @@ public class GenerateMap : MonoBehaviour {
         for (int i = 0; i < numberBlocksX; i++)
         {
             GameObject wallobj = Instantiate(HorizontalWallObject, new Vector2(Xposs, Yposs), HorizontalWallObject.transform.rotation);
-            wallobj.transform.localScale = new Vector2(wallobj.transform.localScale.x, wallEveryX);
+            wallobj.transform.localScale = new Vector3(wallobj.transform.localScale.x, wallEveryX, 1);
             UpWalls[i] = wallobj;
             Xposs += wallEveryX;
 
@@ -100,7 +108,7 @@ public class GenerateMap : MonoBehaviour {
         for (int i = 0; i < numberBlocksY; i++)
         {
             GameObject wallobj = Instantiate(HorizontalWallObject, new Vector2(Xposs, Yposs), Quaternion.identity);
-            wallobj.transform.localScale = new Vector2(wallobj.transform.localScale.x, wallEveryY);
+            wallobj.transform.localScale = new Vector3(wallobj.transform.localScale.x, wallEveryY, 1);
             RightWalls[i] = wallobj;
             Yposs += wallEveryY;
         }
@@ -132,7 +140,7 @@ public class GenerateMap : MonoBehaviour {
             for (int y = 0; y < numberBlocksX; y++)
             {
                 GameObject wallobj = Instantiate(HorizontalWallObject, new Vector2(Xposs, Yposs), HorizontalWallObject.transform.rotation);
-                wallobj.transform.localScale = new Vector2(wallobj.transform.localScale.x, wallEveryX);
+                wallobj.transform.localScale = new Vector3(wallobj.transform.localScale.x, wallEveryX, 1);
                 HorizontalWalls[Hcounter] = wallobj;
                 Hcounter++;
                 Xposs += wallEveryX;
@@ -145,7 +153,7 @@ public class GenerateMap : MonoBehaviour {
             for (int y = 0; y < numberBlocksX; y++)
             {
                 GameObject wallobj = Instantiate(VerticalWallObject, new Vector2(Xposs, Yposs), Quaternion.identity);
-                wallobj.transform.localScale = new Vector2(wallobj.transform.localScale.x, wallEveryY);
+                wallobj.transform.localScale = new Vector3(wallobj.transform.localScale.x, wallEveryY, 1);
                 VerticalWalls[Vcounter] = wallobj;
                 Vcounter++;
                 Xposs += wallEveryX;
@@ -160,19 +168,23 @@ public class GenerateMap : MonoBehaviour {
     {
         if (move == "Left")
         {
-            Destroy(VerticalWalls[poss].gameObject);
+            VerticalWalls[poss].gameObject.GetComponent<Wall>().isDestroyed = true;
+            VerticalWalls[poss].gameObject.GetComponent<Wall>().Dissolve();
         }
         if (move == "Up")
         {
-            Destroy(HorizontalWalls[poss + numberBlocksX].gameObject);
+            HorizontalWalls[poss + numberBlocksX].gameObject.GetComponent<Wall>().isDestroyed = true;
+            HorizontalWalls[poss + numberBlocksX].GetComponent<Wall>().Dissolve();
         }
         if (move == "Right")
         {
-            Destroy(VerticalWalls[poss + 1].gameObject);
+            VerticalWalls[poss + 1].gameObject.GetComponent<Wall>().isDestroyed = true;
+            VerticalWalls[poss + 1].gameObject.GetComponent<Wall>().Dissolve();
         }
         if (move == "Down")
         {
-            Destroy(HorizontalWalls[poss].gameObject);
+            HorizontalWalls[poss].gameObject.GetComponent<Wall>().isDestroyed = true;
+            HorizontalWalls[poss].gameObject.GetComponent<Wall>().Dissolve();
         }
     }
 
@@ -322,19 +334,21 @@ public class GenerateMap : MonoBehaviour {
         WhiteBlockRoute.Add(currentPossWhite);
         UpdateBlockMovement(currentPossWhite, "White");
 
-        GameObject obj = Instantiate(BlackBlock, block[currentPossBlack].Possition, Quaternion.identity);
-        obj.transform.parent = BlocksParent.transform;
+        if (CreateBlockObject)
+        {
+            GameObject obj = Instantiate(BlackBlock, block[currentPossBlack].Possition, Quaternion.identity);
+            obj.transform.parent = BlocksParent.transform;
+            obj = Instantiate(WhiteBlock, block[currentPossWhite].Possition, Quaternion.identity);
+            obj.transform.parent = BlocksParent.transform;
+        }
+
         block[currentPossBlack].CapturedBy = "Black";
-        obj = Instantiate(WhiteBlock, block[currentPossWhite].Possition, Quaternion.identity);
-        obj.transform.parent = BlocksParent.transform;
         block[currentPossWhite].CapturedBy = "White";
+        yield return new WaitForSeconds(GenerateTime);
 
         while (BlackListPointer >= 0 || WhiteListPointer >= 0)
         {
-
-
-
-            yield return new WaitForSeconds(GenerateTime);
+            
             //Black Route
             int nextPossLeft = RandomMove(currentPossBlack, BlackBlock, "Black");
 
@@ -345,8 +359,7 @@ public class GenerateMap : MonoBehaviour {
                 if (BlackListPointer >= 0)
                 {
                     currentPossBlack = BlackBlockRoute[BlackListPointer];
-                    //BlackBlockRoute.Add(currentPossBlack);
-                    //CheckAllBlockSpawn();
+                    
                 }
 
             }
@@ -357,10 +370,7 @@ public class GenerateMap : MonoBehaviour {
                 currentPossBlack = nextPossLeft;
             }
             
-            //print(BlackListPointer);
-
-            yield return new WaitForSeconds(GenerateTime);
-
+            
             //White Route
             int nextPossRight = RandomMove(currentPossWhite, WhiteBlock, "White");
 
@@ -370,8 +380,7 @@ public class GenerateMap : MonoBehaviour {
                 if (WhiteListPointer >= 0)
                 {
                     currentPossWhite = WhiteBlockRoute[WhiteListPointer];
-                    //WhiteBlockRoute.Add(currentPossWhite);
-                    //CheckAllBlockSpawn();
+                    
                 }
             }
             else
@@ -388,8 +397,14 @@ public class GenerateMap : MonoBehaviour {
 
         print("Set Route Finished");
         ChoseLinkWall();
+
+
         int blackGoalPoint = numberBlocksX * numberBlocksY - BlackEntryPoint - 1;
         int whiteGoalPoint = numberBlocksX * numberBlocksY - WhiteEntryPoint - 1;
+
+        dissolveWalls = true;
+
+        yield return new WaitForSeconds(5);
         StartCoroutine(createPath.DefinePath(block, numberBlocksX, BlackEntryPoint, blackGoalPoint, WhiteEntryPoint, whiteGoalPoint));
 
     }
@@ -425,8 +440,11 @@ public class GenerateMap : MonoBehaviour {
 
             int nextPoss = ReturnNextPosition(availableMoves[move], poss);
 
-            GameObject obj = Instantiate(blk, block[nextPoss].Possition, Quaternion.identity);
-            obj.transform.parent = BlocksParent.transform;
+            if (CreateBlockObject)
+            {
+                GameObject obj = Instantiate(blk, block[nextPoss].Possition, Quaternion.identity);
+                obj.transform.parent = BlocksParent.transform;
+            }
 
             PreventBackTracking(nextPoss, availableMoves[move]);
             RemoveWall(poss, availableMoves[move]);
@@ -467,7 +485,7 @@ public class GenerateMap : MonoBehaviour {
 
         }
     }
-        private void UpdateBlockMovement(int poss, string route)
+    private void UpdateBlockMovement(int poss, string route)
     {
        
         
@@ -479,7 +497,7 @@ public class GenerateMap : MonoBehaviour {
                 block[poss]._leftMove = false;
                 if (block[poss - 1].CapturedBy == block[poss].CapturedBy)// The block at the left captured by the same route
                 {
-                    if (VerticalWalls[poss].gameObject) //If there is a wall between them
+                    if (!VerticalWalls[poss].gameObject.GetComponent<Wall>().isDestroyed) //If there is a wall between them
                     {
                         block[poss].LeftMove = false;
                     }
@@ -500,7 +518,7 @@ public class GenerateMap : MonoBehaviour {
                 block[poss]._upMove = false;
                 if (block[poss + numberBlocksX].CapturedBy == block[poss].CapturedBy)
                 {
-                    if (HorizontalWalls[poss + numberBlocksX].gameObject)
+                    if (!HorizontalWalls[poss + numberBlocksX].gameObject.GetComponent<Wall>().isDestroyed)
                     {
                         block[poss].UpMove = false;
                     }
@@ -521,7 +539,7 @@ public class GenerateMap : MonoBehaviour {
                 block[poss]._rightMove = false;
                 if (block[poss + 1].CapturedBy == block[poss].CapturedBy)
                 {
-                    if (VerticalWalls[poss + 1].gameObject)
+                    if (!VerticalWalls[poss + 1].gameObject.GetComponent<Wall>().isDestroyed)
                     {
                         block[poss].RightMove = false;
                     }
@@ -542,7 +560,7 @@ public class GenerateMap : MonoBehaviour {
                 block[poss]._downMove = false;
                 if (block[poss - numberBlocksX].CapturedBy == block[poss].CapturedBy)
                 {
-                    if (HorizontalWalls[poss].gameObject)
+                    if (!HorizontalWalls[poss].gameObject.GetComponent<Wall>().isDestroyed)
                     {
                         block[poss].DownMove = false;
                     }
@@ -619,21 +637,32 @@ public class GenerateMap : MonoBehaviour {
 
 
         }
-       
+
+        float sizeX = (float)sizeSpaceX / numberBlocksX;
+        float sizeY = (float)sizeSpaceY / numberBlocksY;
+        sizeY *= .7f;
         //Entry Black Point
-        Instantiate(BlackArrow, block[BlackEntryPoint].Possition - new Vector2(0, .8f), Quaternion.Euler(0, 0, -90));
+        GameObject obj = Instantiate(BlackEntry, block[BlackEntryPoint].Possition, Quaternion.Euler(0, 0, -90));
+        obj.transform.localScale = new Vector2(sizeX, sizeY);
         Destroy(HorizontalWalls[BlackEntryPoint].gameObject);
         //Goal Black Point
-        Instantiate(BlackArrow, block[block.Length - BlackEntryPoint - 1].Possition + new Vector2(0, .8f), Quaternion.Euler(0, 0, -90));
+        obj = Instantiate(BlackEntry, block[block.Length - BlackEntryPoint - 1].Possition, Quaternion.Euler(0, 0, -90));
+        obj.transform.localScale = new Vector2(sizeX, sizeY);
         Destroy(UpWalls[UpWalls.Length - BlackEntryPoint - 1].gameObject);
 
         //Entry White Point
-        Instantiate(WhiteArrow, block[WhiteEntryPoint].Possition - new Vector2(0, .8f), Quaternion.Euler(0, 0, -90));
+        obj = Instantiate(WhiteEntry, block[WhiteEntryPoint].Possition, Quaternion.Euler(0, 0, -90));
+        obj.transform.localScale = new Vector2(sizeX, sizeY);
         Destroy(HorizontalWalls[WhiteEntryPoint].gameObject);
         //Goal White Point
-        Instantiate(WhiteArrow, block[block.Length - WhiteEntryPoint - 1].Possition + new Vector2(0, .8f), Quaternion.Euler(0, 0, -90));
+        obj = Instantiate(WhiteEntry, block[block.Length - WhiteEntryPoint - 1].Possition, Quaternion.Euler(0, 0, -90));
+        obj.transform.localScale = new Vector2(sizeX, sizeY);
         Destroy(UpWalls[UpWalls.Length - WhiteEntryPoint - 1].gameObject);
     }
+
+
+
+
 
     private void DestroyBlocksObjects()
     {
@@ -657,11 +686,15 @@ public class GenerateMap : MonoBehaviour {
         WhiteBlockRoute.Add(currentPossWhite);
         UpdateBlockMovement(currentPossWhite, "White");
 
-        GameObject obj = Instantiate(BlackBlock, block[currentPossBlack].Possition, Quaternion.identity);
-        obj.transform.parent = BlocksParent.transform;
+        if (CreateBlockObject)
+        {
+            GameObject obj = Instantiate(BlackBlock, block[currentPossBlack].Possition, Quaternion.identity);
+            obj.transform.parent = BlocksParent.transform;
+            obj = Instantiate(WhiteBlock, block[currentPossWhite].Possition, Quaternion.identity);
+            obj.transform.parent = BlocksParent.transform;
+        }
+
         block[currentPossBlack].CapturedBy = "Black";
-        obj = Instantiate(WhiteBlock, block[currentPossWhite].Possition, Quaternion.identity);
-        obj.transform.parent = BlocksParent.transform;
         block[currentPossWhite].CapturedBy = "White";
 
         while (BlackListPointer >= 0 || WhiteListPointer >= 0)
@@ -669,7 +702,7 @@ public class GenerateMap : MonoBehaviour {
 
 
 
-
+            
             //Black Route
             int nextPossLeft = RandomMove(currentPossBlack, BlackBlock, "Black");
 
@@ -680,8 +713,8 @@ public class GenerateMap : MonoBehaviour {
                 if (BlackListPointer >= 0)
                 {
                     currentPossBlack = BlackBlockRoute[BlackListPointer];
-                    BlackBlockRoute.Add(currentPossBlack);
-
+                    //BlackBlockRoute.Add(currentPossBlack);
+                    //CheckAllBlockSpawn();
                 }
 
             }
@@ -692,6 +725,9 @@ public class GenerateMap : MonoBehaviour {
                 currentPossBlack = nextPossLeft;
             }
 
+            //print(BlackListPointer);
+
+           
 
             //White Route
             int nextPossRight = RandomMove(currentPossWhite, WhiteBlock, "White");
@@ -702,8 +738,8 @@ public class GenerateMap : MonoBehaviour {
                 if (WhiteListPointer >= 0)
                 {
                     currentPossWhite = WhiteBlockRoute[WhiteListPointer];
-                    WhiteBlockRoute.Add(currentPossWhite);
-                    CheckAllBlockSpawn();
+                    //WhiteBlockRoute.Add(currentPossWhite);
+                    //CheckAllBlockSpawn();
                 }
             }
             else
@@ -719,25 +755,30 @@ public class GenerateMap : MonoBehaviour {
         }
 
         print("Set Route Finished");
-
         ChoseLinkWall();
+
+
         int blackGoalPoint = numberBlocksX * numberBlocksY - BlackEntryPoint - 1;
         int whiteGoalPoint = numberBlocksX * numberBlocksY - WhiteEntryPoint - 1;
-        //createPath.DefinePath(block, numberBlocksX, BlackEntryPoint, blackGoalPoint, WhiteEntryPoint, whiteGoalPoint);
+
+        StartCoroutine(createPath.DefinePath(block, numberBlocksX, BlackEntryPoint, blackGoalPoint, WhiteEntryPoint, whiteGoalPoint));
 
     }
-    void OnDrawGizmos()
-    {
-        if (showBlockNumbers)
-        {
-            for (int i = 0; i < block.Length; i++)
-            {
 
-                Handles.Label(block[i].Possition, i.ToString());
-            }
-        }
 
-    }
+
+    //void OnDrawGizmos()
+    //{
+    //    if (showBlockNumbers)
+    //    {
+    //        for (int i = 0; i < block.Length; i++)
+    //        {
+
+    //            Handles.Label(block[i].Possition, i.ToString());
+    //        }
+    //    }
+
+    //}
 }
 
 [System.Serializable]

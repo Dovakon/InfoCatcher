@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class CreatePath : MonoBehaviour {
 
-    List<string> path;
+    List<Vector2> Points;
     List<int> possitions;
-    public Vector2[] Points;
-    bool nextmove = false;
+    
+    public bool nextmove = false;
 
 
 
@@ -38,7 +38,7 @@ public class CreatePath : MonoBehaviour {
         print("Goal Point:  " + goalPoint);
 
         int currentPos = entrypoint;
-        path = new List<string>();
+        Points = new List<Vector2>();
         possitions = new List<int>();
         int move;
         int pointer = 0;
@@ -47,8 +47,8 @@ public class CreatePath : MonoBehaviour {
         {
             yield return new WaitUntil(() => nextmove == true);
 
-            nextmove = false;
-            print("currentPos  " + currentPos);
+            //nextmove = false;
+            
             List<string> availableMoves = new List<string>();
 
             if (block[currentPos].LeftMove == true)
@@ -73,7 +73,7 @@ public class CreatePath : MonoBehaviour {
                 move = Random.Range(0, availableMoves.Count);
 
 
-                path.Add(availableMoves[move]);
+                Points.Add(block[currentPos].Possition);
                 possitions.Add(currentPos);
                 pointer++;
 
@@ -107,19 +107,19 @@ public class CreatePath : MonoBehaviour {
             {
                 pointer--;
                 currentPos = possitions[pointer];
-                if (pointer < path.Count)
+                if (pointer < Points.Count)
                 {
-                    path.RemoveAt(pointer);
+                    Points.RemoveAt(pointer);
                     possitions.RemoveAt(pointer);
                 }
                 
-
-                print("pointer  " + pointer);
-                
-
             }
             
         }
+
+        Points.Add(block[goalPoint].Possition);
+        possitions.Add(goalPoint);
+
         print("Create path Finished");
         
     }
@@ -166,21 +166,24 @@ public class CreatePath : MonoBehaviour {
 
     public IEnumerator<Vector2> GetPathEnumerator()
     {
-        if (Points == null || Points.Length < 1)
-            yield break;
+        
+
+        //if (Points == null || Points.Length < 1)
+        //    yield break;
 
         var direction = 1;
         var index = 0;
         while (true)
         {
+            
             yield return Points[index];
 
-            if (Points.Length == 1)
+            if (Points.Count == 1)
                 continue;
 
             if (index <= 0)
                 direction = 1;
-            else if (index >= Points.Length - 1)
+            else if (index >= Points.Count - 1)
                 direction = -1;
 
             index = index + direction;
