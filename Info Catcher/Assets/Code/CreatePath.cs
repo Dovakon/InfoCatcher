@@ -7,27 +7,10 @@ public class CreatePath : MonoBehaviour {
     List<Vector2> Points;
     List<int> possitions;
     
-    public bool nextmove = false;
-
-
-
-    void Update()
-    {
-        if (Input.GetKeyDown("n"))
-        {
-            nextmove = true;
-            
-        }
-    }
-
-
-    public IEnumerator DefinePath(Block[] block,int numberBlocksX, int blackEntry, int blackGoalPoint, int whiteEntry, int whiteGoalPoint)
+    public void DefinePath(Block[] block,int numberBlocksX, int blackEntry, int blackGoalPoint, int whiteEntry, int whiteGoalPoint)
     {
         
         int entrypoint = Random.Range(0, 2);
-
-        print("BlackPoint  " + blackGoalPoint);
-        print("whitePoint  " + whiteGoalPoint);
 
         int goalPoint = entrypoint == 0 ? blackGoalPoint : whiteGoalPoint;
         entrypoint = entrypoint == 0 ? blackEntry : whiteEntry;
@@ -45,9 +28,6 @@ public class CreatePath : MonoBehaviour {
         
         while (currentPos != goalPoint)
         {
-            yield return new WaitUntil(() => nextmove == true);
-
-            //nextmove = false;
             
             List<string> availableMoves = new List<string>();
 
@@ -184,7 +164,8 @@ public class CreatePath : MonoBehaviour {
             if (index <= 0)
                 direction = 1;
             else if (index >= Points.Count - 1)
-                direction = -1;
+                break;
+                //direction = -1;
 
             index = index + direction;
         }

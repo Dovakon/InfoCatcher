@@ -7,7 +7,7 @@ using UnityEngine;
 public class GenerateMap : MonoBehaviour {
 
     [Range(0f, 3)]
-    public float GenerateTime;
+    public float TimeToStart;
 
     public float sizeSpaceX;
     public float sizeSpaceY;
@@ -27,8 +27,7 @@ public class GenerateMap : MonoBehaviour {
     private Block[] block;
     private int BlackEntryPoint = 0;
     private int WhiteEntryPoint = 0;
-    private bool AllBlocksSpawned = false;
-
+    
 
     //Walls//
     private int numberWallsX;
@@ -37,33 +36,25 @@ public class GenerateMap : MonoBehaviour {
     private GameObject[] HorizontalWalls;
     private GameObject[] UpWalls, RightWalls;
     private List<GameObject> LinkWalls;
-    private MaterialPropertyBlock _propBlock;
-    private bool dissolveWalls = false;
+    
+    //EntryPoints//
+    private GameObject _whiteEntryPoint;
+    private GameObject _whiteGoalPoint;
+    private GameObject _blackEntryPoint;
+    private GameObject _blackGoalPoint;
+
     //....///
     public bool insta;
     public bool CreateBlockObject;
     private bool showBlockNumbers = false;
     void Start()
     {
-        _propBlock = new MaterialPropertyBlock();
-        _propBlock.SetFloat("_DissolveAmount", 1);
         LinkWalls = new List<GameObject>();
 
-        DefineBlock();
+        
         InstantiateWalls();
-
-        EntryPoints();
-
-        if (insta)
-        {
-            SetRouteInsta();
-        }
-        else
-        {
-            StartCoroutine(SetRoute());
-        }
-
-
+        
+        GenerateNewMap();
     }
 
     void Update()
@@ -77,9 +68,14 @@ public class GenerateMap : MonoBehaviour {
         {
             showBlockNumbers = true;
         }
-
+        if(Input.GetKeyDown("r"))
+        {
+            GenerateNewMap();
+        }
        
     }
+
+
 
 
     //Walls
@@ -168,22 +164,18 @@ public class GenerateMap : MonoBehaviour {
     {
         if (move == "Left")
         {
-            VerticalWalls[poss].gameObject.GetComponent<Wall>().isDestroyed = true;
             VerticalWalls[poss].gameObject.GetComponent<Wall>().Dissolve();
         }
         if (move == "Up")
         {
-            HorizontalWalls[poss + numberBlocksX].gameObject.GetComponent<Wall>().isDestroyed = true;
             HorizontalWalls[poss + numberBlocksX].GetComponent<Wall>().Dissolve();
         }
         if (move == "Right")
         {
-            VerticalWalls[poss + 1].gameObject.GetComponent<Wall>().isDestroyed = true;
             VerticalWalls[poss + 1].gameObject.GetComponent<Wall>().Dissolve();
         }
         if (move == "Down")
         {
-            HorizontalWalls[poss].gameObject.GetComponent<Wall>().isDestroyed = true;
             HorizontalWalls[poss].gameObject.GetComponent<Wall>().Dissolve();
         }
     }
@@ -217,7 +209,7 @@ public class GenerateMap : MonoBehaviour {
         {
             if (HorizontalWalls[i].gameObject == LinkWalls[wall].gameObject)
             {
-                Destroy(LinkWalls[wall].gameObject);
+                LinkWalls[wall].gameObject.GetComponent<Wall>().Dissolve();
                 // Update Block Movement
                 block[i].DownMove = true;
                 block[i - numberBlocksX].UpMove = true;
@@ -229,7 +221,7 @@ public class GenerateMap : MonoBehaviour {
         {
             if (VerticalWalls[i].gameObject == LinkWalls[wall].gameObject)
             {
-                Destroy(LinkWalls[wall].gameObject);
+                LinkWalls[wall].gameObject.GetComponent<Wall>().Dissolve();
                 block[i - 1].RightMove = true;
                 block[i].LeftMove = true;
                 return;
@@ -315,6 +307,51 @@ public class GenerateMap : MonoBehaviour {
 
     ///......///
 
+    //
+    public void GenerateNewMap()
+    {
+        //if this is the first time this fuction runing in current scene
+        if (!(LinkWalls.Count <= 0))
+        {
+            LinkWalls = new List<GameObject>();
+
+            foreach (var wall in HorizontalWalls)
+            {
+                if (wall.gameObject.GetComponent<Wall>().isDestroyed)
+                    wall.gameObject.GetComponent<Wall>().ReappearWallSprite();
+            }
+            foreach (var wall in VerticalWalls)
+            {
+                if (wall.gameObject.GetComponent<Wall>().isDestroyed)
+                    wall.gameObject.GetComponent<Wall>().ReappearWallSprite();
+            }
+
+            foreach (var wall in UpWalls)
+            {
+                if (wall.gameObject.GetComponent<Wall>().isDestroyed)
+                    wall.gameObject.GetComponent<Wall>().ReappearWallSprite();
+            }
+        }
+        else //if basic map already generate in current scene
+        {
+
+
+        }
+
+        DefineBlock();
+
+        EntryPoints();
+
+        if (insta)
+        {
+            SetRouteInsta();
+        }
+        else
+        {
+            StartCoroutine(SetRoute());
+        }
+
+    }
 
     //Create Map//
     private IEnumerator SetRoute()
@@ -344,7 +381,8 @@ public class GenerateMap : MonoBehaviour {
 
         block[currentPossBlack].CapturedBy = "Black";
         block[currentPossWhite].CapturedBy = "White";
-        yield return new WaitForSeconds(GenerateTime);
+
+        yield return new WaitForSeconds(TimeToStart);
 
         while (BlackListPointer >= 0 || WhiteListPointer >= 0)
         {
@@ -402,10 +440,8 @@ public class GenerateMap : MonoBehaviour {
         int blackGoalPoint = numberBlocksX * numberBlocksY - BlackEntryPoint - 1;
         int whiteGoalPoint = numberBlocksX * numberBlocksY - WhiteEntryPoint - 1;
 
-        dissolveWalls = true;
-
-        yield return new WaitForSeconds(5);
-        StartCoroutine(createPath.DefinePath(block, numberBlocksX, BlackEntryPoint, blackGoalPoint, WhiteEntryPoint, whiteGoalPoint));
+        
+        createPath.DefinePath(block, numberBlocksX, BlackEntryPoint, blackGoalPoint, WhiteEntryPoint, whiteGoalPoint);
 
     }
 
@@ -613,23 +649,10 @@ public class GenerateMap : MonoBehaviour {
             Debug.LogError("Danger!! No Move Available");
         }
     }
-
-    private bool CheckAllBlockSpawn()
-    {
-        bool allspawned = true;
-            
-        foreach (var blk in block)
-        {
-            if(blk.CapturedBy == null)
-            {
-                allspawned = false;
-            }
-        }
-        return allspawned;
-    }
-
     private void EntryPoints()
     {
+        BlackEntryPoint = 0;
+        WhiteEntryPoint = 0;
         while (BlackEntryPoint == WhiteEntryPoint)
         {
             BlackEntryPoint = Random.Range(0, numberBlocksX);
@@ -641,28 +664,40 @@ public class GenerateMap : MonoBehaviour {
         float sizeX = (float)sizeSpaceX / numberBlocksX;
         float sizeY = (float)sizeSpaceY / numberBlocksY;
         sizeY *= .7f;
-        //Entry Black Point
-        GameObject obj = Instantiate(BlackEntry, block[BlackEntryPoint].Possition, Quaternion.Euler(0, 0, -90));
-        obj.transform.localScale = new Vector2(sizeX, sizeY);
-        Destroy(HorizontalWalls[BlackEntryPoint].gameObject);
-        //Goal Black Point
-        obj = Instantiate(BlackEntry, block[block.Length - BlackEntryPoint - 1].Possition, Quaternion.Euler(0, 0, -90));
-        obj.transform.localScale = new Vector2(sizeX, sizeY);
-        Destroy(UpWalls[UpWalls.Length - BlackEntryPoint - 1].gameObject);
 
-        //Entry White Point
-        obj = Instantiate(WhiteEntry, block[WhiteEntryPoint].Possition, Quaternion.Euler(0, 0, -90));
-        obj.transform.localScale = new Vector2(sizeX, sizeY);
-        Destroy(HorizontalWalls[WhiteEntryPoint].gameObject);
-        //Goal White Point
-        obj = Instantiate(WhiteEntry, block[block.Length - WhiteEntryPoint - 1].Possition, Quaternion.Euler(0, 0, -90));
-        obj.transform.localScale = new Vector2(sizeX, sizeY);
-        Destroy(UpWalls[UpWalls.Length - WhiteEntryPoint - 1].gameObject);
+        if (_blackEntryPoint == null)
+        {
+            //Entry Black Point
+            _blackEntryPoint = Instantiate(BlackEntry, block[BlackEntryPoint].Possition, Quaternion.Euler(0, 0, -90));
+            _blackEntryPoint.transform.localScale = new Vector2(sizeX, sizeY);
+            
+            //Goal Black Point
+            _blackGoalPoint = Instantiate(BlackEntry, block[block.Length - BlackEntryPoint - 1].Possition, Quaternion.Euler(0, 0, -90));
+            _blackGoalPoint.transform.localScale = new Vector2(sizeX, sizeY);
+            
+            //Entry White Point
+            _whiteEntryPoint = Instantiate(WhiteEntry, block[WhiteEntryPoint].Possition, Quaternion.Euler(0, 0, -90));
+            _whiteEntryPoint.transform.localScale = new Vector2(sizeX, sizeY);
+            
+            //Goal White Point
+            _whiteGoalPoint = Instantiate(WhiteEntry, block[block.Length - WhiteEntryPoint - 1].Possition, Quaternion.Euler(0, 0, -90));
+            _whiteGoalPoint.transform.localScale = new Vector2(sizeX, sizeY);
+            
+        }
+        else
+        {
+            _blackEntryPoint.transform.position = block[BlackEntryPoint].Possition;
+            _blackGoalPoint.transform.position = block[block.Length - BlackEntryPoint - 1].Possition;
+            _whiteEntryPoint.transform.position = block[WhiteEntryPoint].Possition;
+            _whiteGoalPoint.transform.position = block[block.Length - WhiteEntryPoint - 1].Possition;
+        }
+        //Wall Remove
+        RemoveWall(BlackEntryPoint, "Down");
+        UpWalls[UpWalls.Length - BlackEntryPoint - 1].gameObject.GetComponent<Wall>().Dissolve();
+        RemoveWall(WhiteEntryPoint, "Down");
+        UpWalls[UpWalls.Length - WhiteEntryPoint - 1].gameObject.GetComponent<Wall>().Dissolve();
     }
-
-
-
-
+    
 
     private void DestroyBlocksObjects()
     {
@@ -761,7 +796,7 @@ public class GenerateMap : MonoBehaviour {
         int blackGoalPoint = numberBlocksX * numberBlocksY - BlackEntryPoint - 1;
         int whiteGoalPoint = numberBlocksX * numberBlocksY - WhiteEntryPoint - 1;
 
-        StartCoroutine(createPath.DefinePath(block, numberBlocksX, BlackEntryPoint, blackGoalPoint, WhiteEntryPoint, whiteGoalPoint));
+        createPath.DefinePath(block, numberBlocksX, BlackEntryPoint, blackGoalPoint, WhiteEntryPoint, whiteGoalPoint);
 
     }
 

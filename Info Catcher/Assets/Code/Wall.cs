@@ -2,15 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[HelpURL ("http://thomasmountainborn.com/2016/05/25/materialpropertyblocks/")]
+
 public class Wall : MonoBehaviour {
 
-    [HideInInspector]public bool isDestroyed = false;
+    public bool isDestroyed = false;
 
-    public float Speed = 1, Offset;
+    private float DissolveSpeed = 1, Offset;
+    public float minDissolveSpeed;
+    public float maxDissolveSpeed;
 
     private Renderer _renderer;
     private MaterialPropertyBlock _propBlock;
-    private bool StartDissolve = false; 
+    private bool StartDissolve = false;
+    private bool Reapear = false;
     private float dissolveAmount;
     private float t;
     void Awake()
@@ -26,7 +31,7 @@ public class Wall : MonoBehaviour {
         {
             _renderer.GetPropertyBlock(_propBlock);
            
-            t += (Time.deltaTime * Speed);
+            t += (Time.deltaTime * DissolveSpeed);
             dissolveAmount = Mathf.Lerp(0, 1, t);
             
             // Assign our new value.
@@ -38,13 +43,27 @@ public class Wall : MonoBehaviour {
                 StartDissolve = false; 
 
         }
+        
     }
 
     public void Dissolve()
     {
 
-        Speed = Random.RandomRange(.3f, .8f);
+        DissolveSpeed = Random.Range(minDissolveSpeed, maxDissolveSpeed);
         StartDissolve = true;
+        isDestroyed = true;
+    }
+
+    public void ReappearWallSprite()
+    {
+        isDestroyed = false;
+        t = 0;
+        _renderer.GetPropertyBlock(_propBlock);
+        
+        _propBlock.SetFloat("_DissolveAmount", 0);
+        
+        // Apply the edited values to the renderer.
+        _renderer.SetPropertyBlock(_propBlock);
         
     }
 }

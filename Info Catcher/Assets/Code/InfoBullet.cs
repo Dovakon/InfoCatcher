@@ -17,13 +17,11 @@ public class InfoBullet : MonoBehaviour {
 
     public void Update()
     {
-
         if(Input.GetKeyDown("q"))
         {
             StartMoving();
         }
-
-
+        
         if (CanMove)
         {
             Move();

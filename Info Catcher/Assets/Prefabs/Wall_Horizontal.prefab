@@ -53,8 +53,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isDestroyed: 0
-  Speed: 0.5
-  Offset: 0
+  minDissolveSpeed: 0.3
+  maxDissolveSpeed: 0.8
 --- !u!212 &212960121243691922
 SpriteRenderer:
   m_ObjectHideFlags: 1

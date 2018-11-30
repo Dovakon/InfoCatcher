@@ -6,7 +6,7 @@ Material:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: DissolveWallVertical
+  m_Name: DissolveWallHorizontal
   m_Shader: {fileID: 4800000, guid: f998d3b5c50b283478ecc9cce87d8e91, type: 3}
   m_ShaderKeywords: ETC1_EXTERNAL_ALPHA
   m_LightmapFlags: 4
@@ -35,7 +35,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DissolveMap:
-        m_Texture: {fileID: 2800000, guid: a1425911c7680eb44b826d1d991d436b, type: 3}
+        m_Texture: {fileID: 2800000, guid: 5d980263e073e174db81913624ff6f19, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
