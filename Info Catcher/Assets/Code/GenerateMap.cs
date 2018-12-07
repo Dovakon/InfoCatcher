@@ -9,11 +9,9 @@ public class GenerateMap : MonoBehaviour {
     [Range(0f, 3)]
     public float TimeToStart;
 
-    public float sizeSpaceX;
-    public float sizeSpaceY;
-    public int numberBlocksX;
-    public int numberBlocksY;
+   
 
+    public Levels LevelData;
     public GameObject BlackBlock;
     public GameObject WhiteBlock;
     public GameObject HorizontalWallObject;
@@ -24,10 +22,14 @@ public class GenerateMap : MonoBehaviour {
     public CreatePath createPath;
 
     //Blocks//
+    public int numberBlocksX;
+    public int numberBlocksY;
     private Block[] block;
     private int BlackEntryPoint = 0;
     private int WhiteEntryPoint = 0;
-    
+
+    private float sizeSpaceX;
+    private float sizeSpaceY;
 
     //Walls//
     private int numberWallsX;
@@ -43,18 +45,30 @@ public class GenerateMap : MonoBehaviour {
     private GameObject _blackEntryPoint;
     private GameObject _blackGoalPoint;
 
+    
     //....///
     public bool insta;
     public bool CreateBlockObject;
     private bool showBlockNumbers = false;
+
+
     void Start()
     {
-        LinkWalls = new List<GameObject>();
+
+        LevelData dt = LevelData.TakeLevelData(GameManager.CurrentLevel);
+
+        numberBlocksX = dt.Xblocks;
+        numberBlocksY = dt.Yblocks;
+
+        sizeSpaceX = dt.MapSizeX;
+        sizeSpaceY = dt.MapSizeY;
+
+    LinkWalls = new List<GameObject>();
 
         
         InstantiateWalls();
         
-        GenerateNewMap();
+        
     }
 
     void Update()
@@ -231,7 +245,6 @@ public class GenerateMap : MonoBehaviour {
 
     }
 
-
     //Create Blocks//
 
     private void DefineBlock()
@@ -306,8 +319,7 @@ public class GenerateMap : MonoBehaviour {
     }
 
     ///......///
-
-    //
+    //GameManager Called it
     public void GenerateNewMap()
     {
         //if this is the first time this fuction runing in current scene
@@ -342,19 +354,13 @@ public class GenerateMap : MonoBehaviour {
 
         EntryPoints();
 
-        if (insta)
-        {
-            SetRouteInsta();
-        }
-        else
-        {
-            StartCoroutine(SetRoute());
-        }
+        SetRoute();
 
     }
 
     //Create Map//
-    private IEnumerator SetRoute()
+    
+    private void SetRoute()
     {
         //Track route
         List<int> BlackBlockRoute = new List<int>();
@@ -381,12 +387,10 @@ public class GenerateMap : MonoBehaviour {
 
         block[currentPossBlack].CapturedBy = "Black";
         block[currentPossWhite].CapturedBy = "White";
-
-        yield return new WaitForSeconds(TimeToStart);
+        
 
         while (BlackListPointer >= 0 || WhiteListPointer >= 0)
-        {
-            
+        {   
             //Black Route
             int nextPossLeft = RandomMove(currentPossBlack, BlackBlock, "Black");
 
@@ -645,8 +649,8 @@ public class GenerateMap : MonoBehaviour {
         }
         else
         {
-            return -1;
             Debug.LogError("Danger!! No Move Available");
+            return -1;
         }
     }
     private void EntryPoints()
@@ -704,102 +708,7 @@ public class GenerateMap : MonoBehaviour {
         Destroy(BlocksParent);
     }
 
-    private void SetRouteInsta()
-    {
-        //Track route
-        List<int> BlackBlockRoute = new List<int>();
-        List<int> WhiteBlockRoute = new List<int>();
-
-        int BlackListPointer = 0;
-        int WhiteListPointer = 0;
-
-        //Two Entry Points
-        int currentPossBlack = BlackEntryPoint;
-        BlackBlockRoute.Add(currentPossBlack);
-        UpdateBlockMovement(currentPossBlack, "Black");
-        int currentPossWhite = WhiteEntryPoint;
-        WhiteBlockRoute.Add(currentPossWhite);
-        UpdateBlockMovement(currentPossWhite, "White");
-
-        if (CreateBlockObject)
-        {
-            GameObject obj = Instantiate(BlackBlock, block[currentPossBlack].Possition, Quaternion.identity);
-            obj.transform.parent = BlocksParent.transform;
-            obj = Instantiate(WhiteBlock, block[currentPossWhite].Possition, Quaternion.identity);
-            obj.transform.parent = BlocksParent.transform;
-        }
-
-        block[currentPossBlack].CapturedBy = "Black";
-        block[currentPossWhite].CapturedBy = "White";
-
-        while (BlackListPointer >= 0 || WhiteListPointer >= 0)
-        {
-
-
-
-            
-            //Black Route
-            int nextPossLeft = RandomMove(currentPossBlack, BlackBlock, "Black");
-
-
-            if (nextPossLeft == currentPossBlack)// didnt find any available block to move
-            {
-                BlackListPointer--;              //Go To previews Position
-                if (BlackListPointer >= 0)
-                {
-                    currentPossBlack = BlackBlockRoute[BlackListPointer];
-                    //BlackBlockRoute.Add(currentPossBlack);
-                    //CheckAllBlockSpawn();
-                }
-
-            }
-            else if (BlackListPointer >= 0)
-            {
-                BlackBlockRoute.Add(currentPossBlack);
-                BlackListPointer = BlackBlockRoute.Count - 1;
-                currentPossBlack = nextPossLeft;
-            }
-
-            //print(BlackListPointer);
-
-           
-
-            //White Route
-            int nextPossRight = RandomMove(currentPossWhite, WhiteBlock, "White");
-
-            if (nextPossRight == currentPossWhite)// didnt find any available block to move
-            {
-                WhiteListPointer--;
-                if (WhiteListPointer >= 0)
-                {
-                    currentPossWhite = WhiteBlockRoute[WhiteListPointer];
-                    //WhiteBlockRoute.Add(currentPossWhite);
-                    //CheckAllBlockSpawn();
-                }
-            }
-            else
-            {
-                if (WhiteListPointer >= 0)
-                {
-                    WhiteBlockRoute.Add(currentPossWhite);
-                    WhiteListPointer = WhiteBlockRoute.Count - 1;
-                    currentPossWhite = nextPossRight;
-                }
-            }
-
-        }
-
-        print("Set Route Finished");
-        ChoseLinkWall();
-
-
-        int blackGoalPoint = numberBlocksX * numberBlocksY - BlackEntryPoint - 1;
-        int whiteGoalPoint = numberBlocksX * numberBlocksY - WhiteEntryPoint - 1;
-
-        createPath.DefinePath(block, numberBlocksX, BlackEntryPoint, blackGoalPoint, WhiteEntryPoint, whiteGoalPoint);
-
-    }
-
+   
 
 
     //void OnDrawGizmos()

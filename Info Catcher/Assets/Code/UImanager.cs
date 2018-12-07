@@ -1,14 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class UImanager : MonoBehaviour {
 
-    public GameObject BlackArrow;
-    public GameObject WhiteArrow;
+    [SerializeField] private TextMeshProUGUI CountdownText;
+    
+    private void Update()
+    {
+        CountdownText.text = GameManager.TimeLeft.ToString("F");
+    }
 
 
-   //public void SpawnArrows()
-	
-	
 }

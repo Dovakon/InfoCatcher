@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93508d8bf9511f548b4ffc564001dfa6, type: 3}
+  m_Name: Levels
+  m_EditorClassIdentifier: 
+  _levels:
+  - name: Level1-3
+    MaxLevel: 3
+    Xblocks: 4
+    Yblocks: 6
+    counterTime: 200
+    Traps: 100
+    ShowCounter: 1
+    MinDissolveWallTime: 0.3
+    MaxDissolveWallTime: 0.8
+    MapSizeX: 4.8
+    MapSizeY: 8
+  - name: Level4-6
+    MaxLevel: 6
+    Xblocks: 6
+    Yblocks: 8
+    counterTime: 10
+    Traps: 1
+    ShowCounter: 1
+    MinDissolveWallTime: 0.3
+    MaxDissolveWallTime: 0.8
+    MapSizeX: 4.8
+    MapSizeY: 8
+  - name: Level6-10
+    MaxLevel: 10
+    Xblocks: 8
+    Yblocks: 10
+    counterTime: 10
+    Traps: 2
+    ShowCounter: 1
+    MinDissolveWallTime: 0.3
+    MaxDissolveWallTime: 0.8
+    MapSizeX: 4.8
+    MapSizeY: 8
