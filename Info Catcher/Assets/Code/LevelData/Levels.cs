@@ -35,7 +35,7 @@ public class LevelData
         public int Xblocks;
         public int Yblocks;
 
-        public float counterTime;
+        public int Time;
 
         public int Traps;
 

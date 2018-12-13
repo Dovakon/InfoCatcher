@@ -161,11 +161,12 @@ public class CreatePath : MonoBehaviour {
             if (Points.Count == 1)
                 continue;
 
-            if (index <= 0)
-                direction = 1;
+            //if Arrive to GoalPoint
             else if (index >= Points.Count - 1)
+            {
+                GameManager.Instance.ExecuteThirdPhase(false);
                 break;
-                //direction = -1;
+            }  
 
             index = index + direction;
         }

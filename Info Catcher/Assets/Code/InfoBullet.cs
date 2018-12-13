@@ -13,7 +13,11 @@ public class InfoBullet : MonoBehaviour {
 
     private bool CanMove = false;
     private IEnumerator<Vector2> _currentPoint;
-    
+
+    private void OnEnable()
+    {
+        GameManager.SecondPhaseEvent += StartMoving;
+    }
 
     public void Update()
     {
@@ -58,5 +62,12 @@ public class InfoBullet : MonoBehaviour {
         if (distanceSquared < MaxDistanceToGoal * MaxDistanceToGoal)
             _currentPoint.MoveNext();
     }
-  
+
+
+    private void OnTriggerEnter2D(Collider2D Trap)
+    {
+        CanMove = false;
+        transform.position = new Vector2(-2, -2);
+        GameManager.Instance.ExecuteThirdPhase(true);
+    }
 }

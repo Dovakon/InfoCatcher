@@ -7,8 +7,6 @@ public class TrapSpawn : MonoBehaviour {
     public Levels levelData;
     public GameObject Trap;
 
-
-
     private bool canSpawnTrap;
 
     private int availableTraps;
@@ -17,7 +15,8 @@ public class TrapSpawn : MonoBehaviour {
     private float mapSizeY;
     private int xBlocks;
     private int yBlocks;
-    void Start ()
+
+    void Start()
     {
         LevelData dt = levelData.TakeLevelData(GameManager.CurrentLevel);
         mapSizeX = dt.MapSizeX;
@@ -25,50 +24,72 @@ public class TrapSpawn : MonoBehaviour {
         xBlocks = dt.Xblocks;
         yBlocks = dt.Yblocks;
         availableTraps = dt.Traps;
-        
 
+        TrapsLeftToSpawn = availableTraps;
     }
 
     private void OnEnable()
     {
         //Subscribe to event
-        GameManager.AllowTrapEvent += AllowSpawnTrap;
+        GameManager.FirstPhaseEvent += AllowSpawnTrap;
+        GameManager.ResetGameEvent += ResetGame;
     }
 
     void Update()
     {
-
-        if (Input.touchCount > 0 && canSpawnTrap)
-        {
-            Touch touch = Input.GetTouch(0);
-            if (touch.phase == TouchPhase.Began)
+          if (Input.touchCount > 0 && canSpawnTrap)
             {
+                Touch touch = Input.GetTouch(0);
+                if (touch.phase == TouchPhase.Began)
+                {
                 if (TrapsLeftToSpawn > 0)
                 {
                     Vector2 pos = ReturnTrapPosition(touch.position);
-                    Instantiate(Trap, pos, Quaternion.identity);
+                    SpawnTrap(pos);
                     TrapsLeftToSpawn--;
+
+                    if (TrapsLeftToSpawn <= 0)
+                    {
+                        canSpawnTrap = false;
+                        GameManager.Instance.ExecuteSecondPhase();
+                    }
                 }
-                else
-                {
-                    canSpawnTrap = false;
-                }
+
             }
         }
     }
+    
+    private void SpawnTrap(Vector2 pos)
+    {
+        float xTrapSize = mapSizeX / xBlocks;
+        float yTrapSize = mapSizeY / yBlocks;
+        GameObject obj = Instantiate(Trap, pos, Quaternion.identity);
+        obj.transform.localScale = new Vector2(xTrapSize, yTrapSize);
+    }
     private void AllowSpawnTrap()
     {
-        TrapsLeftToSpawn = availableTraps;
         canSpawnTrap = true;
-
     }
 
-    private Vector2 ReturnTrapPosition(Vector2 touchPos)
+    private void ResetGame()
     {
-        print("Count");
+        LevelData dt = levelData.TakeLevelData(GameManager.CurrentLevel);
+        mapSizeX = dt.MapSizeX;
+        mapSizeY = dt.MapSizeY;
+        xBlocks = dt.Xblocks;
+        yBlocks = dt.Yblocks;
+        availableTraps = dt.Traps;
+
+        TrapsLeftToSpawn = availableTraps;
+
         GameObject obj = GameObject.FindGameObjectWithTag("Trap");
         Object.Destroy(obj);
 
+
+    }
+    private Vector2 ReturnTrapPosition(Vector2 touchPos)
+    {
+       
         Vector2 pos;
         pos = Camera.main.ScreenToWorldPoint(touchPos);
         float everyX = (float)mapSizeX/xBlocks;
@@ -84,11 +105,7 @@ public class TrapSpawn : MonoBehaviour {
             
             if(pos.x < Xtransision)
             {
-                print("Xtouch  " + pos.x);
                 posX = ((Xtransision - everyX) + Xtransision) / 2;
-                print("Xpos  " + posX);
-                print("EveryX  " + everyX);
-                print("praksi  " + (everyX - (mapSizeX / xBlocks)));
                 break;
             }
             else
@@ -104,9 +121,6 @@ public class TrapSpawn : MonoBehaviour {
             {
                 
                 posY = ((Ytransision - everyY) + Ytransision) / 2;
-                //print("Ytouch" + posY);
-                //print("EveryY" + everyY);
-                //print("praksi" + (everyY - (mapSizeY / yBlocks)));
                 break;
             }
             else
@@ -115,8 +129,6 @@ public class TrapSpawn : MonoBehaviour {
             }
         }
 
-        //print("Xtouch" + posX);
-        
         pos = new Vector2(posX, posY);
        
         return pos;
