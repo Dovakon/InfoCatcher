@@ -21,7 +21,7 @@ MonoBehaviour:
     ShowCounter: 1
     MinDissolveWallTime: 0.3
     MaxDissolveWallTime: 0.8
-    MapSizeX: 4.8
+    MapSizeX: 5
     MapSizeY: 8
   - name: Level4-6
     MaxLevel: 6
@@ -32,7 +32,7 @@ MonoBehaviour:
     ShowCounter: 1
     MinDissolveWallTime: 0.3
     MaxDissolveWallTime: 0.8
-    MapSizeX: 4.8
+    MapSizeX: 5
     MapSizeY: 8
   - name: Level6-10
     MaxLevel: 10
@@ -43,5 +43,5 @@ MonoBehaviour:
     ShowCounter: 1
     MinDissolveWallTime: 0.3
     MaxDissolveWallTime: 0.8
-    MapSizeX: 4.8
+    MapSizeX: 5
     MapSizeY: 8

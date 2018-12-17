@@ -51,7 +51,9 @@ public class GenerateMap : MonoBehaviour {
     //....///
     public bool insta;
     public bool CreateBlockObject;
+    public bool RandomStart;
     private bool showBlockNumbers = false;
+
 
 
     void Start()
@@ -371,14 +373,33 @@ public class GenerateMap : MonoBehaviour {
         int BlackListPointer = 0;
         int WhiteListPointer = 0;
 
-        //Two Entry Points
-        int currentPossBlack = RedEntryPoint;
-        BlackBlockRoute.Add(currentPossBlack);
-        UpdateBlockMovement(currentPossBlack, "Black");
-        int currentPossWhite = GreenEntryPoint;
-        WhiteBlockRoute.Add(currentPossWhite);
-        UpdateBlockMovement(currentPossWhite, "White");
-
+        int currentPossBlack = 0;
+        int currentPossWhite = 0;
+        if (RandomStart)
+        {
+            while(currentPossBlack == currentPossWhite)
+            {
+                Debug.Log("Block Length  " + block.Length);
+                currentPossBlack = Random.Range(0, block.Length);
+                currentPossWhite = Random.Range(0, block.Length); ;
+            }
+            
+            BlackBlockRoute.Add(currentPossBlack);
+            UpdateBlockMovement(currentPossBlack, "Black");
+            
+            WhiteBlockRoute.Add(currentPossWhite);
+            UpdateBlockMovement(currentPossWhite, "White");
+        }
+        else
+        {
+            //Two Entry Points
+            currentPossBlack = RedEntryPoint;
+            BlackBlockRoute.Add(currentPossBlack);
+            UpdateBlockMovement(currentPossBlack, "Black");
+            currentPossWhite = GreenEntryPoint;
+            WhiteBlockRoute.Add(currentPossWhite);
+            UpdateBlockMovement(currentPossWhite, "White");
+        }
 
 
         if (CreateBlockObject)

@@ -32,6 +32,7 @@ public class TrapSpawn : MonoBehaviour {
     {
         //Subscribe to event
         GameManager.FirstPhaseEvent += AllowSpawnTrap;
+        GameManager.SecondPhaseEvent += ForbitSpawnTrap;
         GameManager.ResetGameEvent += ResetGame;
     }
 
@@ -71,6 +72,10 @@ public class TrapSpawn : MonoBehaviour {
         canSpawnTrap = true;
     }
 
+    private void ForbitSpawnTrap()
+    {
+        canSpawnTrap = false;
+    }
     private void ResetGame()
     {
         LevelData dt = levelData.TakeLevelData(GameManager.CurrentLevel);

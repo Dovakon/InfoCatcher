@@ -94,8 +94,10 @@ public class GameManager : MonoBehaviour {
     public void ExecuteSecondPhase()
     {
         //This Phase start when Timer finished or all Traps have spawned
-        Debug.Log("SecondPhaseExecute");
+        StartCounter = false;
+        TimeLeft = 0;
         StartSecondPhase = true;
+
     }
     public void ExecuteThirdPhase(bool Succeed)
     {
@@ -136,8 +138,6 @@ public class GameManager : MonoBehaviour {
         //Second Phase -- InfoBullet Start moving
         yield return new WaitUntil(() => StartSecondPhase == true);
         print("Second Phase Start");
-        StartCounter = false;
-        TimeLeft = 0;
         SecondPhaseEvent();
 
         //Thrird Phase - Check if InfoBullet has been Catched or Espace
