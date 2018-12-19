@@ -8,6 +8,7 @@ public class InfoBullet : MonoBehaviour {
     public CreatePath Path;
     public float Speed=1;
     public float MaxDistanceToGoal=.1f;
+    public string ColorPath;
 
 
 
@@ -41,7 +42,7 @@ public class InfoBullet : MonoBehaviour {
             return;
         }
 
-        _currentPoint = Path.GetPathEnumerator();
+        _currentPoint = Path.GetPathEnumerator(ColorPath);
         _currentPoint.MoveNext();
 
         if (_currentPoint.Current == null)
