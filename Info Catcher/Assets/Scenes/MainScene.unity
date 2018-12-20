@@ -173,7 +173,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 12
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &161328594
 GameObject:
@@ -465,7 +465,7 @@ Prefab:
     - target: {fileID: 114209715565500034, guid: 48253976bd34edd458c6351d72f0593e,
         type: 2}
       propertyPath: CreateBlockObject
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114209715565500034, guid: 48253976bd34edd458c6351d72f0593e,
         type: 2}
@@ -486,20 +486,8 @@ Prefab:
     - target: {fileID: 114209715565500034, guid: 48253976bd34edd458c6351d72f0593e,
         type: 2}
       propertyPath: RandomStart
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 114209715565500034, guid: 48253976bd34edd458c6351d72f0593e,
-        type: 2}
-      propertyPath: RedEntry
-      value: 
-      objectReference: {fileID: 1690068652091298, guid: ed915ce8988e9bd4db670dd80ea9d04e,
-        type: 2}
-    - target: {fileID: 114209715565500034, guid: 48253976bd34edd458c6351d72f0593e,
-        type: 2}
-      propertyPath: GreenEntry
-      value: 
-      objectReference: {fileID: 1292720026410930, guid: 409fbc3d9e9378549a81228af274d7c2,
-        type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 48253976bd34edd458c6351d72f0593e, type: 2}
   m_IsPrefabAsset: 0
@@ -543,7 +531,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 14
+  m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &359565959
 GameObject:
@@ -918,14 +906,10 @@ Prefab:
       propertyPath: m_IsTrigger
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 1270983871302566, guid: 90aff01265ef75246a505332c513d5d8, type: 2}
-      propertyPath: m_Name
-      value: RedInfoBullet
-      objectReference: {fileID: 0}
     - target: {fileID: 114935048339901906, guid: 90aff01265ef75246a505332c513d5d8,
         type: 2}
-      propertyPath: ColorPath
-      value: Red
+      propertyPath: Speed
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 90aff01265ef75246a505332c513d5d8, type: 2}
@@ -956,7 +940,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &796308107
 GameObject:
@@ -1226,7 +1210,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1222277936
 GameObject:
@@ -1347,72 +1331,6 @@ MonoBehaviour:
     type: 2}
   m_PrefabInternal: {fileID: 1350638706}
   m_Script: {fileID: 11500000, guid: 03db03aaa8fd52a4f8a54720ceb89272, type: 3}
---- !u!1001 &1387754384
-Prefab:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 4655429946414018, guid: 90aff01265ef75246a505332c513d5d8, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: -2
-      objectReference: {fileID: 0}
-    - target: {fileID: 4655429946414018, guid: 90aff01265ef75246a505332c513d5d8, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 0.66
-      objectReference: {fileID: 0}
-    - target: {fileID: 4655429946414018, guid: 90aff01265ef75246a505332c513d5d8, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4655429946414018, guid: 90aff01265ef75246a505332c513d5d8, type: 2}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4655429946414018, guid: 90aff01265ef75246a505332c513d5d8, type: 2}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4655429946414018, guid: 90aff01265ef75246a505332c513d5d8, type: 2}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4655429946414018, guid: 90aff01265ef75246a505332c513d5d8, type: 2}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4655429946414018, guid: 90aff01265ef75246a505332c513d5d8, type: 2}
-      propertyPath: m_RootOrder
-      value: 7
-      objectReference: {fileID: 0}
-    - target: {fileID: 114935048339901906, guid: 90aff01265ef75246a505332c513d5d8,
-        type: 2}
-      propertyPath: Path
-      value: 
-      objectReference: {fileID: 1350638707}
-    - target: {fileID: 50169261628907970, guid: 90aff01265ef75246a505332c513d5d8,
-        type: 2}
-      propertyPath: m_BodyType
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 61591392753477908, guid: 90aff01265ef75246a505332c513d5d8,
-        type: 2}
-      propertyPath: m_IsTrigger
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1270983871302566, guid: 90aff01265ef75246a505332c513d5d8, type: 2}
-      propertyPath: m_Name
-      value: GreenInfoBullet
-      objectReference: {fileID: 0}
-    - target: {fileID: 114935048339901906, guid: 90aff01265ef75246a505332c513d5d8,
-        type: 2}
-      propertyPath: ColorPath
-      value: Green
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 90aff01265ef75246a505332c513d5d8, type: 2}
-  m_IsPrefabAsset: 0
 --- !u!1 &1754839652
 GameObject:
   m_ObjectHideFlags: 0
@@ -1530,7 +1448,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 13
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1840053433
 GameObject:
@@ -1598,7 +1516,7 @@ RectTransform:
   m_Children:
   - {fileID: 1008312617}
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1658,5 +1576,5 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

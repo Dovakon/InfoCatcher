@@ -12,18 +12,19 @@ public class UImanager : MonoBehaviour {
     private void OnEnable()
     {
         GameManager.FirstPhaseEvent += LevelStarted;
+        CurrentLevelText.text = "Lv. " + GameManager.CurrentLevel.ToString();
     }
 
     private void Update()
     {
         CountdownText.text = GameManager.TimeLeft.ToString("F");
-        WinsInaRowText.text = GameManager.WinsInaRow.ToString("F");
+        WinsInaRowText.text = GameManager.WinsInaRow.ToString() + "/10";
         
     }
 
     private void LevelStarted()
     {
-        CurrentLevelText.text = GameManager.CurrentLevel.ToString("F");
+        CurrentLevelText.text = "Lv. " + GameManager.CurrentLevel.ToString();
     }
 
 }

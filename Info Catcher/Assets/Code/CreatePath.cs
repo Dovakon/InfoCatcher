@@ -4,29 +4,29 @@ using UnityEngine;
 
 public class CreatePath : MonoBehaviour {
 
-    List<Vector2> RedPoints;
-    List<Vector2> GreenPoints;
+    List<Vector2> Points;
+    List<int> possitions;
     
-    public void DefinePath(Block[] block,int numberBlocksX, int EntryPoint, int GoalPoint, string ColorPath)
+    public void DefinePath(Block[] block,int numberBlocksX, int blackEntry, int blackGoalPoint, int whiteEntry, int whiteGoalPoint)
     {
         
-        //int entrypoint = Random.Range(0, 2);
+        int entrypoint = Random.Range(0, 2);
 
-        //int goalPoint = entrypoint == 0 ? blackGoalPoint : whiteGoalPoint;
-        //entrypoint = entrypoint == 0 ? blackEntry : whiteEntry;
+        int goalPoint = entrypoint == 0 ? blackGoalPoint : whiteGoalPoint;
+        entrypoint = entrypoint == 0 ? blackEntry : whiteEntry;
         
       
 
-        //print("Start Point:  " + entrypoint);
-        //print("Goal Point:  " + goalPoint);
+        print("Start Point:  " + entrypoint);
+        print("Goal Point:  " + goalPoint);
 
-        int currentPos = EntryPoint;
-        List<Vector2> Points = new List<Vector2>();
-        List<int> Possitions = new List<int>();
+        int currentPos = entrypoint;
+        Points = new List<Vector2>();
+        possitions = new List<int>();
         int move;
         int pointer = 0;
         
-        while (currentPos != GoalPoint)
+        while (currentPos != goalPoint)
         {
             
             List<string> availableMoves = new List<string>();
@@ -54,7 +54,7 @@ public class CreatePath : MonoBehaviour {
 
 
                 Points.Add(block[currentPos].Possition);
-                Possitions.Add(currentPos);
+                possitions.Add(currentPos);
                 pointer++;
 
                 int nextPoss = ReturnNextPosition(availableMoves[move], currentPos, numberBlocksX);
@@ -86,36 +86,22 @@ public class CreatePath : MonoBehaviour {
             else
             {
                 pointer--;
-                currentPos = Possitions[pointer];
+                currentPos = possitions[pointer];
                 if (pointer < Points.Count)
                 {
                     Points.RemoveAt(pointer);
-                    Possitions.RemoveAt(pointer);
+                    possitions.RemoveAt(pointer);
                 }
                 
             }
             
         }
 
-        Points.Add(block[GoalPoint].Possition);
-        Possitions.Add(GoalPoint);
-
-        if(ColorPath == "Red")
-        {
-            RedPoints = Points;
-        }
-        else if(ColorPath == "Green")
-        {
-            GreenPoints = Points;
-        }
-
+        Points.Add(block[goalPoint].Possition);
+        possitions.Add(goalPoint);
 
         print("Create path Finished");
-
-
-        /////////////////////////////////////////
-
-
+        
     }
 
    
@@ -158,19 +144,10 @@ public class CreatePath : MonoBehaviour {
 
   
 
-    public IEnumerator<Vector2> GetPathEnumerator(string colorPath)
+    public IEnumerator<Vector2> GetPathEnumerator()
     {
+        
 
-        List<Vector2> Points = new List<Vector2>();
-
-        if (colorPath == "Red")
-        {
-            Points = RedPoints;
-        }
-        else if(colorPath == "Green")
-        {
-            Points = GreenPoints;
-        }
         //if (Points == null || Points.Length < 1)
         //    yield break;
 
@@ -187,7 +164,7 @@ public class CreatePath : MonoBehaviour {
             //if Arrive to GoalPoint
             else if (index >= Points.Count - 1)
             {
-                //GameManager.Instance.ExecuteThirdPhase(false);
+                GameManager.Instance.ExecuteThirdPhase(false);
                 break;
             }  
 
@@ -195,5 +172,4 @@ public class CreatePath : MonoBehaviour {
         }
 
     }
-   
 }

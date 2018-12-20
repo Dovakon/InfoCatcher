@@ -86,8 +86,20 @@ public class GameManager : MonoBehaviour {
 
     void TakePlayerData()
     {
-        CurrentLevel = _currentLevel;
-        WinsInaRow = 0;
+        PlayerData data = SaveLoadManager.LoadGame();
+        print("data  " + data);
+        if (data != null)
+        {
+            CurrentLevel = data.CurrentLevel;
+            WinsInaRow = data.WinInaRow;
+            print(CurrentLevel);
+            print(WinsInaRow);
+        }
+        else
+        {
+            CurrentLevel = 1;
+            WinsInaRow = 0;
+        }
     }
 
 
@@ -154,6 +166,9 @@ public class GameManager : MonoBehaviour {
             }
             
         }
+
+        SaveLoadManager.SaveGame();
+
         ResetGame();
 
 

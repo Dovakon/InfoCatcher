@@ -14,8 +14,8 @@ MonoBehaviour:
   _levels:
   - name: Level1-3
     MaxLevel: 3
-    Xblocks: 8
-    Yblocks: 10
+    Xblocks: 6
+    Yblocks: 8
     Time: 10
     Traps: 1
     ShowCounter: 1
