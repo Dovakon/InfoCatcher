@@ -56,11 +56,13 @@ public class PlayerData
 
     public int CurrentLevel;
     public int WinInaRow;
+    public bool SoundsOn;
 
     public PlayerData()
         {
             CurrentLevel = GameManager.CurrentLevel;
             WinInaRow = GameManager.WinsInaRow;
+            SoundsOn = true;
             
         }
 
