@@ -27,7 +27,7 @@ MonoBehaviour:
     MaxLevel: 6
     Xblocks: 6
     Yblocks: 8
-    Time: 0
+    Time: 10
     Traps: 1
     ShowCounter: 1
     MinDissolveWallTime: 0.3
@@ -38,7 +38,7 @@ MonoBehaviour:
     MaxLevel: 10
     Xblocks: 8
     Yblocks: 10
-    Time: 0
+    Time: 10
     Traps: 2
     ShowCounter: 1
     MinDissolveWallTime: 0.3

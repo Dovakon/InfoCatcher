@@ -136,8 +136,8 @@ public class CreatePath : MonoBehaviour {
         }
         else
         {
-            return -1;
             Debug.LogError("Danger!! No Move Available");
+            return -1;
         }
     }
 

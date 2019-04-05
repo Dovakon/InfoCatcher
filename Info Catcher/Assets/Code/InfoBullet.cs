@@ -20,12 +20,7 @@ public class InfoBullet : MonoBehaviour {
     }
 
     public void Update()
-    {
-        if(Input.GetKeyDown("q"))
-        {
-            StartMoving();
-        }
-        
+    {   
         if (CanMove)
         {
             Move();
@@ -37,7 +32,7 @@ public class InfoBullet : MonoBehaviour {
     {
         if (Path == null)
         {
-            Debug.LogError("Path cannot be null", gameObject);
+            Debug.LogError("Path cannot be null");
             return;
         }
 

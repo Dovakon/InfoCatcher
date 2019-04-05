@@ -12,7 +12,7 @@ public class Levels : ScriptableObject {
     {
         for (int i = 0; i < _levels.Length ; i++)
         {
-            if(currentLevel < _levels[i].MaxLevel)
+            if(currentLevel <= _levels[i].MaxLevel)
             {
                 return _levels[i];
             }

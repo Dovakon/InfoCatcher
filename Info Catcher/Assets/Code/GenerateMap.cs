@@ -19,6 +19,7 @@ public class GenerateMap : MonoBehaviour {
     public GameObject BlackEntry;
     public GameObject WhiteEntry;
     public GameObject BlocksParent;
+    public GameObject WallParent;
     public CreatePath createPath;
 
     //Blocks//
@@ -67,10 +68,10 @@ public class GenerateMap : MonoBehaviour {
         sizeSpaceX = dt.MapSizeX;
         sizeSpaceY = dt.MapSizeY;
 
-    LinkWalls = new List<GameObject>();
+        LinkWalls = new List<GameObject>();
 
         
-        InstantiateWalls();
+        
         
         
     }
@@ -104,6 +105,7 @@ public class GenerateMap : MonoBehaviour {
         {
             GameObject wallobj = Instantiate(HorizontalWallObject, new Vector2(Xposs, Yposs), HorizontalWallObject.transform.rotation);
             wallobj.transform.localScale = new Vector3(wallobj.transform.localScale.x, wallEveryX, 1);
+            wallobj.transform.parent = WallParent.transform;
             UpWalls[i] = wallobj;
             Xposs += wallEveryX;
 
@@ -115,6 +117,7 @@ public class GenerateMap : MonoBehaviour {
         {
             GameObject wallobj = Instantiate(HorizontalWallObject, new Vector2(Xposs, Yposs), Quaternion.identity);
             wallobj.transform.localScale = new Vector3(wallobj.transform.localScale.x, wallEveryY, 1);
+            wallobj.transform.parent = WallParent.transform;
             RightWalls[i] = wallobj;
             Yposs += wallEveryY;
         }
@@ -147,6 +150,7 @@ public class GenerateMap : MonoBehaviour {
             {
                 GameObject wallobj = Instantiate(HorizontalWallObject, new Vector2(Xposs, Yposs), HorizontalWallObject.transform.rotation);
                 wallobj.transform.localScale = new Vector3(wallobj.transform.localScale.x, wallEveryX, 1);
+                wallobj.transform.parent = WallParent.transform;
                 HorizontalWalls[Hcounter] = wallobj;
                 Hcounter++;
                 Xposs += wallEveryX;
@@ -160,6 +164,7 @@ public class GenerateMap : MonoBehaviour {
             {
                 GameObject wallobj = Instantiate(VerticalWallObject, new Vector2(Xposs, Yposs), Quaternion.identity);
                 wallobj.transform.localScale = new Vector3(wallobj.transform.localScale.x, wallEveryY, 1);
+                wallobj.transform.parent = WallParent.transform;
                 VerticalWalls[Vcounter] = wallobj;
                 Vcounter++;
                 Xposs += wallEveryX;
@@ -340,9 +345,9 @@ public class GenerateMap : MonoBehaviour {
                     wall.gameObject.GetComponent<Wall>().ReappearWallSprite();
             }
         }
-        else //if basic map already generate in current scene
+        else //if This is the first time 
         {
-
+            InstantiateWalls();
 
         }
         if(CreateBlockObject)

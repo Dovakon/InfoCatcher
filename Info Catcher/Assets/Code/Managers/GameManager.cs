@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour {
 
@@ -71,35 +72,39 @@ public class GameManager : MonoBehaviour {
         else if (Input.touchCount > 0 && !LevelRuning)
         {
 
-            StartCoroutine(GameFlow());
+            //StartCoroutine(GameFlow());
 
         }
         else if (Input.GetKey("space") && !LevelRuning )
         {
             StartCoroutine(GameFlow());
         }
-        else if (Input.GetKey("l"))
+        else if (Input.GetKey("d"))
         {
-            //GameFlow().MoveNext();
+            DeleteSave();
         }
     }
 
     void TakePlayerData()
     {
         PlayerData data = SaveLoadManager.LoadGame();
-        print("data  " + data);
+
         if (data != null)
         {
             CurrentLevel = data.CurrentLevel;
             WinsInaRow = data.WinInaRow;
-            print(CurrentLevel);
-            print(WinsInaRow);
         }
         else
         {
             CurrentLevel = 1;
             WinsInaRow = 0;
         }
+    }
+
+    public void StartGame()
+    {
+        if(LevelRuning == false)
+            StartCoroutine(GameFlow());
     }
 
 
@@ -111,12 +116,12 @@ public class GameManager : MonoBehaviour {
         StartSecondPhase = true;
 
     }
-    public void ExecuteThirdPhase(bool Succeed)
+    public void ExecuteThirdPhase(bool IsSucceed)
     {
         //This Phase start when InfoBullet Arrive to GoalPoint or Catched from trap
         //GreatePath.cs & InfoBullet.cs
 
-        LevelSucceed = Succeed;
+        LevelSucceed = IsSucceed;
         StartThirdPhase = true;
     }
 
@@ -158,23 +163,39 @@ public class GameManager : MonoBehaviour {
         if (LevelSucceed)
         {
             WinsInaRow++;
-           if(WinsInaRow >= 10)
+           if(WinsInaRow >= 5)
             {
-                //Save Data//
-                //Player Level++
-                //Load Scene Again
+                CurrentLevel++;
+                WinsInaRow = 0;
+                SaveLoadManager.SaveGame();
+
+                FirstPhaseEvent = null;
+                SecondPhaseEvent = null; ;
+                ResetGameEvent = null;
+
+                Scene scene = SceneManager.GetActiveScene();
+                SceneManager.LoadScene(scene.name);
+                yield return null;
             }
             
         }
 
+        //WinsInaRow = 0;
         SaveLoadManager.SaveGame();
-
         ResetGame();
+
+
+
 
 
 
         LevelRuning = false;
     }
 
-    
+
+    public void DeleteSave()
+    {
+        SaveLoadManager.DeleteSavedGame();
+    }
+
 }

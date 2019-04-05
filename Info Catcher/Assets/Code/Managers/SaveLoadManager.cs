@@ -9,7 +9,7 @@ public static class SaveLoadManager
     public static void SaveGame()
     {
         BinaryFormatter bf = new BinaryFormatter();
-        FileStream stream = new FileStream(Application.dataPath + "/GameData.dat", FileMode.Create);
+        FileStream stream = new FileStream(Application.persistentDataPath + "/GameData.txt", FileMode.Create);
 
         PlayerData data = new PlayerData();
 
@@ -23,9 +23,9 @@ public static class SaveLoadManager
 
         BinaryFormatter bf = new BinaryFormatter();
 
-        if (File.Exists(Application.dataPath + "/GameData.dat"))
+        if (File.Exists(Application.persistentDataPath + "/GameData.txt"))
         {
-            FileStream stream = new FileStream(Application.dataPath + "/GameData.dat", FileMode.Open);
+            FileStream stream = new FileStream(Application.persistentDataPath + "/GameData.txt", FileMode.Open);
 
             PlayerData data = bf.Deserialize(stream) as PlayerData;
 
@@ -42,9 +42,10 @@ public static class SaveLoadManager
 
     public static void DeleteSavedGame()
     {
-        if (File.Exists(Application.dataPath + "/GameData.dat"))
+        if (File.Exists(Application.persistentDataPath + "/GameData.txt"))
         {
-            File.Delete(Application.dataPath + "/GameData.dat");
+            File.Delete(Application.persistentDataPath + "/GameData.txt");
+            Debug.Log("Delete");
         }
     }
 }
