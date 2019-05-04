@@ -7,7 +7,7 @@ public class GameManager : MonoBehaviour {
 
     public static GameManager Instance { get; private set; }
 
-    public static int CurrentLevel;
+    [HideInInspector] public static int CurrentLevel;
     public static float TimeLeft;
     public static int WinsInaRow = 0;
 
@@ -140,16 +140,25 @@ public class GameManager : MonoBehaviour {
 
     public IEnumerator GameFlow()
     {
+        //Allow to for game to prepared
+        yield return new WaitForSeconds(1f);
+
+
+
+
         LevelRuning = true;
 
         //Game Start//
         TimeLeft = TimeToSpawnTraps;
-        StartCounter = true;
+        
         Map.GenerateNewMap();
 
+        yield return new WaitForSeconds(1f);
+        Map.RunNewMap();
         //First Phase -- Allow Trap Spawn
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(2);
         print("First Phase Start");
+        StartCounter = true;
         FirstPhaseEvent();
 
         //Second Phase -- InfoBullet Start moving

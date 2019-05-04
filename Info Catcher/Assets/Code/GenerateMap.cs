@@ -359,6 +359,10 @@ public class GenerateMap : MonoBehaviour {
         }
 
 
+    }
+
+    public void RunNewMap()
+    {
         DefineBlock();
 
         EntryPoints();
@@ -368,7 +372,7 @@ public class GenerateMap : MonoBehaviour {
     }
 
     //Create Map//
-    
+
     private void SetRoute()
     {
         //Track route
