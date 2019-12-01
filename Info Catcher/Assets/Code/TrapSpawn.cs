@@ -16,6 +16,14 @@ public class TrapSpawn : MonoBehaviour {
     private int xBlocks;
     private int yBlocks;
 
+    private void OnEnable()
+    {
+        //Subscribe to event
+        GameManager.FirstPhaseEvent += AllowSpawnTrap;
+        GameManager.SecondPhaseEvent += ForbitSpawnTrap;
+        GameManager.ResetGameEvent += ResetGame;
+    }
+
     void Start()
     {
         LevelData dt = levelData.TakeLevelData(GameManager.CurrentLevel);
@@ -27,14 +35,7 @@ public class TrapSpawn : MonoBehaviour {
 
         TrapsLeftToSpawn = availableTraps;
     }
-
-    private void OnEnable()
-    {
-        //Subscribe to event
-        GameManager.FirstPhaseEvent += AllowSpawnTrap;
-        GameManager.SecondPhaseEvent += ForbitSpawnTrap;
-        GameManager.ResetGameEvent += ResetGame;
-    }
+    
 
     void Update()
     {
@@ -67,6 +68,12 @@ public class TrapSpawn : MonoBehaviour {
         GameObject obj = Instantiate(Trap, pos, Quaternion.identity);
         obj.transform.localScale = new Vector2(xTrapSize, yTrapSize);
     }
+
+    public void TakeAvailableBlocks()
+    {
+
+    }
+
     private void AllowSpawnTrap()
     {
         canSpawnTrap = true;

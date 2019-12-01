@@ -5,9 +5,10 @@ using UnityEngine;
 public class CreatePath : MonoBehaviour {
 
     List<Vector2> Points;
+    
     List<int> possitions;
     
-    public void DefinePath(Block[] block,int numberBlocksX, int blackEntry, int blackGoalPoint, int whiteEntry, int whiteGoalPoint)
+    public void DefinePath(Block[] block,int numberBlocksX, int blackEntry, int blackGoalPoint, int whiteEntry, int whiteGoalPoint, Block choosenBlock)
     {
         
         int entrypoint = Random.Range(0, 2);
@@ -100,6 +101,22 @@ public class CreatePath : MonoBehaviour {
         Points.Add(block[goalPoint].Possition);
         possitions.Add(goalPoint);
 
+        foreach (Block _block in block)
+        {
+            int counter = 0;
+            while(_block.Possition != Points[counter] || counter <= Points.Count){
+                counter++;
+            }
+
+            if (counter <= Points.Count){
+                //add _block to list
+            }
+            
+        }
+
+
+
+
         print("Create path Finished");
         
     }
@@ -141,8 +158,10 @@ public class CreatePath : MonoBehaviour {
         }
     }
 
-
-  
+    //private Vector2 ChoseCorrectBlock()
+    //{
+    //    return
+    //}
 
     public IEnumerator<Vector2> GetPathEnumerator()
     {

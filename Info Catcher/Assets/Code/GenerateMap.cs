@@ -69,10 +69,6 @@ public class GenerateMap : MonoBehaviour {
         sizeSpaceY = dt.MapSizeY;
 
         LinkWalls = new List<GameObject>();
-
-        
-        
-        
         
     }
 
@@ -82,12 +78,53 @@ public class GenerateMap : MonoBehaviour {
         {
             showBlockNumbers = true;
         }
-        
        
     }
 
 
+   
 
+    ///......///
+    //GameManager Called it
+    public void GenerateNewMap()
+    {
+        //if this is not the first time this fuction runing in current scene
+        if (!(LinkWalls.Count <= 0))
+        {
+            LinkWalls = new List<GameObject>();
+
+            foreach (var wall in HorizontalWalls)
+            {
+                if (wall.gameObject.GetComponent<Wall>().isDestroyed)
+                    wall.gameObject.GetComponent<Wall>().ReappearWallSprite();
+            }
+            foreach (var wall in VerticalWalls)
+            {
+                if (wall.gameObject.GetComponent<Wall>().isDestroyed)
+                    wall.gameObject.GetComponent<Wall>().ReappearWallSprite();
+            }
+
+            foreach (var wall in UpWalls)
+            {
+                if (wall.gameObject.GetComponent<Wall>().isDestroyed)
+                    wall.gameObject.GetComponent<Wall>().ReappearWallSprite();
+            }
+        }
+        else //if This is the first time 
+        {
+            InstantiateWalls();
+
+        }
+        if (CreateBlockObject)
+        {
+            foreach (Transform child in BlocksParent.transform)
+            {
+                GameObject.Destroy(child.gameObject);
+            }
+        }
+
+
+    }
 
     //Walls
     private void InstantiateWalls()
@@ -216,7 +253,7 @@ public class GenerateMap : MonoBehaviour {
 
     }
 
-    private void ChoseLinkWall()
+    private Block ChoseLinkWall()
     {
         int wall = Random.Range(0, LinkWalls.Count);
 
@@ -228,7 +265,16 @@ public class GenerateMap : MonoBehaviour {
                 // Update Block Movement
                 block[i].DownMove = true;
                 block[i - numberBlocksX].UpMove = true;
-                return;
+
+                print("up link wall: " + block[i].Possition);
+                print("down link wall: " + block[i - numberBlocksX].Possition);
+
+                int randomLink = Random.Range(0, 2);
+                print("randonm Link  " + randomLink);
+
+                Block chossenBlock = randomLink == 0 ? block[i] : block[i - numberBlocksX];
+                print(" chossen Block " + chossenBlock.Possition);
+                return chossenBlock;
             }
         }
 
@@ -239,20 +285,39 @@ public class GenerateMap : MonoBehaviour {
                 LinkWalls[wall].gameObject.GetComponent<Wall>().Dissolve();
                 block[i - 1].RightMove = true;
                 block[i].LeftMove = true;
-                return;
+
+                print("Left link wall: " + block[i - 1].Possition);
+                print("right link wall: " + block[i].Possition);
+
+                int randomLink = Random.Range(0, 2);
+                print("randonm Link  " + randomLink);
+
+                Block chossenBlock = randomLink == 0 ? block[i] : block[i - 1];
+                print(" chossen Block " + chossenBlock.Possition);
+                return chossenBlock;
             }
         }
 
+        return null;
 
     }
 
+
+
+    public void RunNewMap()
+    {
+        DefineBlock();
+
+        EntryPoints();
+
+        SetRoute();
+
+    }
     //Create Blocks//
 
     private void DefineBlock()
     {
-
-
-
+        
         block = new Block[numberBlocksX * numberBlocksY];
         float blockEveryX = (float)sizeSpaceX / numberBlocksX;
         float blockEveryY = (float)sizeSpaceY / numberBlocksY;
@@ -274,6 +339,7 @@ public class GenerateMap : MonoBehaviour {
 
                 block[counter] = new Block
                 {
+                    id = counter,
                     Possition = new Vector2(xposs, yposs)
                 };
 
@@ -319,57 +385,8 @@ public class GenerateMap : MonoBehaviour {
         }
     }
 
-    ///......///
-    //GameManager Called it
-    public void GenerateNewMap()
-    {
-        //if this is not the first time this fuction runing in current scene
-        if (!(LinkWalls.Count <= 0))
-        {
-            LinkWalls = new List<GameObject>();
-
-            foreach (var wall in HorizontalWalls)
-            {
-                if (wall.gameObject.GetComponent<Wall>().isDestroyed)
-                    wall.gameObject.GetComponent<Wall>().ReappearWallSprite();
-            }
-            foreach (var wall in VerticalWalls)
-            {
-                if (wall.gameObject.GetComponent<Wall>().isDestroyed)
-                    wall.gameObject.GetComponent<Wall>().ReappearWallSprite();
-            }
-
-            foreach (var wall in UpWalls)
-            {
-                if (wall.gameObject.GetComponent<Wall>().isDestroyed)
-                    wall.gameObject.GetComponent<Wall>().ReappearWallSprite();
-            }
-        }
-        else //if This is the first time 
-        {
-            InstantiateWalls();
-
-        }
-        if(CreateBlockObject)
-        {
-            foreach (Transform child in BlocksParent.transform)
-            {
-                GameObject.Destroy(child.gameObject);
-            }
-        }
-
-
-    }
-
-    public void RunNewMap()
-    {
-        DefineBlock();
-
-        EntryPoints();
-
-        SetRoute();
-
-    }
+   
+   
 
     //Create Map//
 
@@ -475,14 +492,14 @@ public class GenerateMap : MonoBehaviour {
         }
 
         print("Set Route Finished");
-        ChoseLinkWall();
+        Block choosenBlock = ChoseLinkWall();
 
 
         //int blackGoalPoint = numberBlocksX * numberBlocksY - RedEntryPoint - 1;
         //int whiteGoalPoint = numberBlocksX * numberBlocksY - GreenEntryPoint - 1;
 
         
-        createPath.DefinePath(block, numberBlocksX, RedEntryPoint, RedGoalPoint, GreenGoalPoint, GreenEntryPoint);
+        createPath.DefinePath(block, numberBlocksX, RedEntryPoint, RedGoalPoint, GreenGoalPoint, GreenEntryPoint, choosenBlock);
 
     }
 
@@ -773,6 +790,8 @@ public class GenerateMap : MonoBehaviour {
 [System.Serializable]
 public class Block
 {
+    public int id;
+        
     //Searching Movement//
     public bool _leftMove = true;
     public bool _upMove = true;

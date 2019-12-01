@@ -114,6 +114,8 @@ public class GameManager : MonoBehaviour {
         StartCounter = false;
         TimeLeft = 0;
         StartSecondPhase = true;
+        //Event Trigger
+        SecondPhaseEvent();
 
     }
     public void ExecuteThirdPhase(bool IsSucceed)
@@ -164,7 +166,7 @@ public class GameManager : MonoBehaviour {
         //Second Phase -- InfoBullet Start moving
         yield return new WaitUntil(() => StartSecondPhase == true);
         print("Second Phase Start");
-        SecondPhaseEvent();
+        
 
         //Thrird Phase - Check if InfoBullet has been Catched or Espace
         yield return new WaitUntil(() => StartThirdPhase == true);
